@@ -158,11 +158,17 @@ function applyOnSaveTransformations(
 		return;
 	}
 
-	insertFinalNewlineTransform(editorconfig, textDocument);
+	const editor = findEditor(textDocument);
+	if (!editor) {
+		return;
+	}
+
+	insertFinalNewlineTransform(editorconfig, editor, textDocument);
 }
 
 function insertFinalNewlineTransform(
 	editorconfig: editorconfig.knownProps,
+	editor: TextEditor,
 	textDocument: TextDocument
 ): void {
 
@@ -174,11 +180,6 @@ function insertFinalNewlineTransform(
 	const lastLine = textDocument.lineAt(lineCount - 1);
 	const lastLineLength = lastLine.text.length;
 	if (lastLineLength < 1) {
-		return;
-	}
-
-	const editor = findEditor(textDocument);
-	if (!editor) {
 		return;
 	}
 
