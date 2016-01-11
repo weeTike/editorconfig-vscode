@@ -6,6 +6,7 @@ import {
 	Disposable,
 	ExtensionContext,
 	Position,
+	Range,
 	TextDocument,
 	TextEdit,
 	TextEditor,
@@ -164,6 +165,7 @@ function applyOnSaveTransformations(
 	}
 
 	insertFinalNewlineTransform(editorconfig, editor, textDocument);
+	trimTrailingWhitespaceTransform(editorconfig, editor, textDocument);
 }
 
 function insertFinalNewlineTransform(
@@ -187,6 +189,37 @@ function insertFinalNewlineTransform(
 		const pos = new Position(lastLine.lineNumber, lastLineLength);
 		return edit.insert(pos, newline(editorconfig));
 	}).then(() => textDocument.save());
+}
+
+function trimTrailingWhitespaceTransform(
+	editorconfig: editorconfig.knownProps,
+	editor: TextEditor,
+	textDocument: TextDocument): void {
+
+	const editorAlreadyTrimsWhitespace = workspace.getConfiguration('files')['trimTrailingWhitespace'];
+	const nothingToDo = !editorconfig.trim_trailing_whitespace || editorAlreadyTrimsWhitespace;
+
+	if (nothingToDo) {
+		return;
+	}
+
+	const trailingWhitespaceRegex = new RegExp('/(\s)$/');
+	for (let i = 0; i < textDocument.lineCount; i++) {
+		const line = textDocument.lineAt(i);
+		const trimmedLine = trimTrailingWhitespace(line.text);
+		if (trimmedLine !== line.text) {
+			editor.edit(edit => {
+				const whitespaceBegin = new Position(line.lineNumber, trimmedLine.length);
+				const whitespaceEnd = new Position(line.lineNumber, line.text.length);
+				const whitespace = new Range(whitespaceBegin, whitespaceEnd);
+				edit.delete(whitespace);
+			}).then(() => textDocument.save());
+		}
+	}
+}
+
+function trimTrailingWhitespace(input: string): string {
+	return input.replace(/[\s\uFEFF\xA0]+$/g, '');
 }
 
 function newline(editorconfig: editorconfig.knownProps): string {
