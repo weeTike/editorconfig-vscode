@@ -14,6 +14,8 @@ import {
 	workspace
 } from 'vscode';
 
+let defaults;
+
 export function activate(ctx: ExtensionContext): void {
 	ctx.subscriptions.push(new DocumentWatcher());
 
@@ -111,6 +113,10 @@ function applyEditorConfigToTextEditor(
 		// No more open editors
 		return;
 	}
+	if (!defaults) {
+		defaults = textEditor.options;
+	}
+
 
 	const doc = textEditor.document;
 	const editorconfig = provider.getSettingsForDocument(doc);
@@ -120,7 +126,7 @@ function applyEditorConfigToTextEditor(
 		return;
 	}
 
-	const { insertSpaces, tabSize } = textEditor.options;
+	const { insertSpaces, tabSize } = defaults;
 	const newOptions = Utils.fromEditorConfig(
 		editorconfig,
 		{
