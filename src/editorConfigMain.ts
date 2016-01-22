@@ -15,14 +15,7 @@ import {
 } from 'vscode';
 
 export function activate(ctx: ExtensionContext): void {
-
-	const documentWatcher = new DocumentWatcher();
-
-	ctx.subscriptions.push(documentWatcher);
-	ctx.subscriptions.push(window.onDidChangeActiveTextEditor((textEditor) => {
-		applyEditorConfigToTextEditor(textEditor, documentWatcher);
-	}));
-	applyEditorConfigToTextEditor(window.activeTextEditor, documentWatcher);
+	ctx.subscriptions.push(new DocumentWatcher());
 
 	// register a command handler to generate a .editorconfig file
 	commands.registerCommand('vscode.generateeditorconfig', generateEditorConfig);
@@ -42,12 +35,14 @@ class DocumentWatcher implements IEditorConfigProvider {
 
 	constructor() {
 
-		const subscriptions: Disposable[] = []
+		const subscriptions: Disposable[] = [];
 
-		// Listen for new documents being openend
-		subscriptions.push(workspace.onDidOpenTextDocument(
-			doc => this._onDidOpenDocument(doc)
-		));
+		// Listen for changes in the active text editor
+		subscriptions.push(window.onDidChangeActiveTextEditor(textEditor => {
+			if (textEditor && textEditor.document) {
+				this._onDidOpenDocument(textEditor.document);
+			}
+		}));
 
 		// Listen for saves to ".editorconfig" files and rebuild the map
 		subscriptions.push(workspace.onDidSaveTextDocument(savedDocument => {
@@ -89,6 +84,12 @@ class DocumentWatcher implements IEditorConfigProvider {
 		}
 
 		const path = document.fileName;
+
+		if (this._documentToConfigMap[path]) {
+			applyEditorConfigToTextEditor(window.activeTextEditor, this);
+			return;
+		}
+
 		editorconfig.parse(path).then((config: editorconfig.knownProps) => {
 			if (config.indent_size === 'tab') {
 				config.indent_size = config.tab_width;
