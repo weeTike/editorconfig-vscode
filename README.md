@@ -1,9 +1,11 @@
 # Editor Config for Visual Studio Code
 
+Forked from [`Microsoft/vscode-editorconfig`](https://github.com/Microsoft/vscode-editorconfig).
+
 ## Installation
 
 ```
-ext install vscodeEditorConfig
+ext install EditorConfig
 ```
 
 ##Supported Properties
@@ -18,4 +20,3 @@ ext install vscodeEditorConfig
 * `charset`
 * `end_of_line`
 * `trim_trailing_whitespace`
-

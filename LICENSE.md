@@ -1,4 +1,4 @@
-Copyright (c) Microsoft Corporation
+Copyright (c) EditorConfig Team
 
 All rights reserved.
 
