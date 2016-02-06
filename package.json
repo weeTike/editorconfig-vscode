@@ -1,51 +1,51 @@
 {
-	"name": "EditorConfig",
-	"displayName": "EditorConfig for VS Code",
-	"description": "EditorConfig Support for Visual Studio Code",
-	"publisher": "EditorConfig",
-	"version": "0.1.0",
-	"icon": "./EditorConfig_icon.png",
-	"engines": {
-		"vscode": "^0.10.1"
-	},
-	"author": "EditorConfig Team",
-	"license": "MIT",
-	"categories": [
-		"Other"
-	],
-	"homepage": "https://github.com/editorconfig/editorconfig-vscode/blob/master/README.md",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/editorconfig/editorconfig-vscode.git"
-	},
-	"bugs": {
-		"url": "https://github.com/editorconfig/editorconfig-vscode/issues"
-	},
-	"galleryBanner": {
-		"color": "#37699A",
-		"theme": "dark"
-	},
-	"activationEvents": [
-		"*"
-	],
-	"main": "./out/src/editorConfigMain",
-	"contributes": {
-		"commands": [
-			{
-				"command": "vscode.generateeditorconfig",
-				"title": "EditorConfig: Generate"
-			}
-		]
-	},
-	"dependencies": {
-		"editorconfig": "0.12.2"
-	},
-	"devDependencies": {
-		"typescript": "^1.6.2",
-		"vscode": "0.10.x"
-	},
-	"scripts": {
-		"vscode:prepublish": "node ./node_modules/vscode/bin/compile",
-		"compile": "node ./node_modules/vscode/bin/compile -watch -p ./"
-	}
+  "name": "EditorConfig",
+  "displayName": "EditorConfig for VS Code",
+  "description": "EditorConfig Support for Visual Studio Code",
+  "publisher": "EditorConfig",
+  "version": "0.1.0",
+  "icon": "./EditorConfig_icon.png",
+  "engines": {
+    "vscode": "^0.10.1"
+  },
+  "author": "EditorConfig Team",
+  "license": "MIT",
+  "categories": [
+    "Other"
+  ],
+  "homepage": "https://github.com/editorconfig/editorconfig-vscode/blob/master/README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/editorconfig/editorconfig-vscode.git"
+  },
+  "bugs": {
+    "url": "https://github.com/editorconfig/editorconfig-vscode/issues"
+  },
+  "galleryBanner": {
+    "color": "#37699A",
+    "theme": "dark"
+  },
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./out/src/editorConfigMain",
+  "contributes": {
+    "commands": [
+      {
+        "command": "vscode.generateeditorconfig",
+        "title": "EditorConfig: Generate"
+      }
+    ]
+  },
+  "dependencies": {
+    "editorconfig": "0.12.2"
+  },
+  "devDependencies": {
+    "typescript": "^1.7.5",
+    "vscode": "0.10.x"
+  },
+  "scripts": {
+    "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
+    "compile": "node ./node_modules/vscode/bin/compile -watch -p ./"
+  }
 }
