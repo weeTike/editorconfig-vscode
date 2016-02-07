@@ -11,6 +11,7 @@ import {
 	TextEdit,
 	TextEditor,
 	TextEditorOptions,
+	TextLine,
 	window,
 	workspace
 } from 'vscode';
@@ -194,7 +195,8 @@ function insertFinalNewlineTransform(
 function trimTrailingWhitespaceTransform(
 	editorconfig: editorconfig.knownProps,
 	editor: TextEditor,
-	textDocument: TextDocument): void {
+	textDocument: TextDocument
+): void {
 
 	const editorAlreadyTrimsWhitespace = workspace.getConfiguration('files')['trimTrailingWhitespace'];
 	const nothingToDo = !editorconfig.trim_trailing_whitespace || editorAlreadyTrimsWhitespace;
@@ -203,18 +205,21 @@ function trimTrailingWhitespaceTransform(
 		return;
 	}
 
-	const trailingWhitespaceRegex = new RegExp('/(\s)$/');
 	for (let i = 0; i < textDocument.lineCount; i++) {
-		const line = textDocument.lineAt(i);
+		trimLineTrailingWhitespace(textDocument.lineAt(i));
+	}
+
+	function trimLineTrailingWhitespace(line: TextLine) {
 		const trimmedLine = trimTrailingWhitespace(line.text);
-		if (trimmedLine !== line.text) {
-			editor.edit(edit => {
-				const whitespaceBegin = new Position(line.lineNumber, trimmedLine.length);
-				const whitespaceEnd = new Position(line.lineNumber, line.text.length);
-				const whitespace = new Range(whitespaceBegin, whitespaceEnd);
-				edit.delete(whitespace);
-			}).then(() => textDocument.save());
+		if (trimmedLine === line.text) {
+			return;
 		}
+		editor.edit(edit => {
+			const whitespaceBegin = new Position(line.lineNumber, trimmedLine.length);
+			const whitespaceEnd = new Position(line.lineNumber, line.text.length);
+			const whitespace = new Range(whitespaceBegin, whitespaceEnd);
+			edit.delete(whitespace);
+		}).then(textDocument.save);
 	}
 }
 
