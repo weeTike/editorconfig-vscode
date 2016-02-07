@@ -1,4 +1,4 @@
-# Editor Config for Visual Studio Code
+# EditorConfig for Visual Studio Code
 
 Forked from [`Microsoft/vscode-editorconfig`](https://github.com/Microsoft/vscode-editorconfig).
 
