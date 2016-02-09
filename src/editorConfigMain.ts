@@ -165,43 +165,44 @@ function applyOnSaveTransformations(
 		return;
 	}
 
-	insertFinalNewlineTransform(editorconfig, editor, textDocument);
-	trimTrailingWhitespaceTransform(editorconfig, editor, textDocument);
+	trimTrailingWhitespaceTransform(editorconfig, editor, textDocument)
+		.then(() => insertFinalNewlineTransform(editorconfig, editor, textDocument))
+		.then(() => textDocument.save());
 }
 
 function insertFinalNewlineTransform(
 	editorconfig: editorconfig.knownProps,
 	editor: TextEditor,
 	textDocument: TextDocument
-): void {
+): Thenable<any> {
 
 	const lineCount = textDocument.lineCount;
 	if (!editorconfig.insert_final_newline || lineCount === 0) {
-		return;
+		return Promise.resolve();
 	}
 
 	const lastLine = textDocument.lineAt(lineCount - 1);
 	const lastLineLength = lastLine.text.length;
 	if (lastLineLength < 1) {
-		return;
+		return Promise.resolve();
 	}
 
-	editor.edit(edit => {
+	return editor.edit(edit => {
 		const pos = new Position(lastLine.lineNumber, lastLineLength);
 		return edit.insert(pos, newline(editorconfig));
-	}).then(() => textDocument.save());
+	});
 }
 
 function trimTrailingWhitespaceTransform(
 	editorconfig: editorconfig.knownProps,
 	editor: TextEditor,
 	textDocument: TextDocument
-): void {
+): Thenable<any> {
 
 	const editorTrimsWhitespace = workspace.getConfiguration('files').get('trimTrailingWhitespace', false);
 
 	if (editorTrimsWhitespace || !editorconfig.trim_trailing_whitespace) {
-		return;
+		return Promise.resolve();
 	}
 
 	const trimmingOperations = [];
@@ -210,7 +211,7 @@ function trimTrailingWhitespaceTransform(
 		trimmingOperations.push(trimLineTrailingWhitespace(textDocument.lineAt(i)));
 	}
 
-	Promise.all(trimmingOperations).then(() => textDocument.save());
+	return Promise.all(trimmingOperations);
 
 	function trimLineTrailingWhitespace(line: TextLine) {
 		const trimmedLine = trimTrailingWhitespace(line.text);
