@@ -16,7 +16,7 @@ import {
 	workspace
 } from 'vscode';
 
-let defaults;
+let defaults: TextEditorOptions;
 
 export function activate(ctx: ExtensionContext): void {
 	ctx.subscriptions.push(new DocumentWatcher());
@@ -115,10 +115,10 @@ function applyEditorConfigToTextEditor(
 		// No more open editors
 		return;
 	}
+
 	if (!defaults) {
 		defaults = textEditor.options;
 	}
-
 
 	const doc = textEditor.document;
 	const editorconfig = provider.getSettingsForDocument(doc);
