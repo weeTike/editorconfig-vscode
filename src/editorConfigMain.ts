@@ -198,28 +198,32 @@ function trimTrailingWhitespaceTransform(
 	textDocument: TextDocument
 ): void {
 
-	const editorAlreadyTrimsWhitespace = workspace.getConfiguration('files')['trimTrailingWhitespace'];
-	const nothingToDo = !editorconfig.trim_trailing_whitespace || editorAlreadyTrimsWhitespace;
+	const editorTrimsWhitespace = workspace.getConfiguration('files').get('trimTrailingWhitespace', false);
 
-	if (nothingToDo) {
+	if (editorTrimsWhitespace || !editorconfig.trim_trailing_whitespace) {
 		return;
 	}
 
+	const trimmingOperations = [];
+
 	for (let i = 0; i < textDocument.lineCount; i++) {
-		trimLineTrailingWhitespace(textDocument.lineAt(i));
+		trimmingOperations.push(trimLineTrailingWhitespace(textDocument.lineAt(i)));
 	}
+
+	Promise.all(trimmingOperations).then(() => textDocument.save());
 
 	function trimLineTrailingWhitespace(line: TextLine) {
 		const trimmedLine = trimTrailingWhitespace(line.text);
 		if (trimmedLine === line.text) {
 			return;
 		}
-		editor.edit(edit => {
+
+		return editor.edit(edit => {
 			const whitespaceBegin = new Position(line.lineNumber, trimmedLine.length);
 			const whitespaceEnd = new Position(line.lineNumber, line.text.length);
 			const whitespace = new Range(whitespaceBegin, whitespaceEnd);
 			edit.delete(whitespace);
-		}).then(textDocument.save);
+		});
 	}
 }
 
