@@ -1,5 +1,7 @@
 # EditorConfig for Visual Studio Code
 
+[![Build Status](https://travis-ci.org/editorconfig/editorconfig-vscode.svg?branch=master)](https://travis-ci.org/editorconfig/editorconfig-vscode)
+
 Forked from [`Microsoft/vscode-editorconfig`](https://github.com/Microsoft/vscode-editorconfig).
 
 ## Installation
