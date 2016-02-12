@@ -1,3 +1,7 @@
+## 0.2.3
+- [Fix applying transformations to .editorconfig itself](https://github.com/editorconfig/editorconfig-vscode/issues/9) (thanks [`@SamVerschueren`](https://github.com/SamVerschueren))!
+- [Fix marketplace icon](https://github.com/editorconfig/editorconfig-vscode/commits/master) (thanks [`@SamVerschueren`](https://github.com/SamVerschueren))!
+
 ## 0.2.2
 - [Fix defaults](https://github.com/editorconfig/editorconfig-vscode/issues/3) (thanks [`@SamVerschueren`](https://github.com/SamVerschueren))!
 
