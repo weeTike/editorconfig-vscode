@@ -59,8 +59,9 @@ class DocumentWatcher implements IEditorConfigProvider {
 		// Listen for saves to ".editorconfig" files and rebuild the map
 		subscriptions.push(workspace.onDidSaveTextDocument(savedDocument => {
 			if (basename(savedDocument.fileName) === '.editorconfig') {
-				// Saved an .editorconfig file => rebuild map entirely
-				this._rebuildConfigMap();
+				// Saved an .editorconfig file => rebuild map entirely and then apply the changes to the .editorconfig file itself
+				this._rebuildConfigMap().then(applyOnSaveTransformations.bind(undefined, savedDocument, this));
+				return;
 			}
 			applyOnSaveTransformations(savedDocument, this);
 		}));
@@ -82,33 +83,31 @@ class DocumentWatcher implements IEditorConfigProvider {
 	public getSettingsForDocument(
 		document: TextDocument
 	): editorconfig.knownProps {
-		return this._documentToConfigMap[document.fileName];
+ 		return this._documentToConfigMap[document.fileName];
 	}
 
 	public getDefaultSettings(): EditorSettings {
 		return this._defaults;
 	}
 
-	private _rebuildConfigMap(): void {
+	private _rebuildConfigMap(): Thenable<void[]> {
 		this._documentToConfigMap = {};
-		workspace.textDocuments.forEach(
-			document => this._onDidOpenDocument(document)
-		);
+		return Promise.all(workspace.textDocuments.map(document => this._onDidOpenDocument(document)));
 	}
 
-	private _onDidOpenDocument(document: TextDocument): void {
+	private _onDidOpenDocument(document: TextDocument): Thenable<void> {
 		if (document.isUntitled) {
 			// Does not have a fs path
-			return;
+			return Promise.resolve();
 		}
 		const path = document.fileName;
 
 		if (this._documentToConfigMap[path]) {
 			applyEditorConfigToTextEditor(window.activeTextEditor, this);
-			return;
+			return Promise.resolve();
 		}
 
-		editorconfig.parse(path).then((config: editorconfig.knownProps) => {
+		return editorconfig.parse(path).then((config: editorconfig.knownProps) => {
 			if (config.indent_size === 'tab') {
 				config.indent_size = config.tab_width;
 			}
