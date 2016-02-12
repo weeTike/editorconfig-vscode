@@ -16,8 +16,6 @@ import {
 	workspace
 } from 'vscode';
 
-let defaults: TextEditorOptions;
-
 export function activate(ctx: ExtensionContext): void {
 	ctx.subscriptions.push(new DocumentWatcher());
 
@@ -25,8 +23,14 @@ export function activate(ctx: ExtensionContext): void {
 	commands.registerCommand('vscode.generateeditorconfig', generateEditorConfig);
 }
 
+interface EditorSettings {
+	tabSize: string | number,
+	insertSpaces: string | boolean
+}
+
 interface IEditorConfigProvider {
 	getSettingsForDocument(document: TextDocument): editorconfig.knownProps;
+	getDefaultSettings(): any;
 }
 
 /**
@@ -36,6 +40,7 @@ class DocumentWatcher implements IEditorConfigProvider {
 
 	private _documentToConfigMap: { [uri: string]: editorconfig.knownProps };
 	private _disposable: Disposable;
+	private _defaults: EditorSettings;
 
 	constructor() {
 
@@ -47,6 +52,9 @@ class DocumentWatcher implements IEditorConfigProvider {
 				this._onDidOpenDocument(textEditor.document);
 			}
 		}));
+
+		// Listen for changes in the configuration
+		subscriptions.push(workspace.onDidChangeConfiguration(this._onConfigChanged.bind(this)));
 
 		// Listen for saves to ".editorconfig" files and rebuild the map
 		subscriptions.push(workspace.onDidSaveTextDocument(savedDocument => {
@@ -62,6 +70,9 @@ class DocumentWatcher implements IEditorConfigProvider {
 
 		// Build the map (cover the case that documents were opened before my activation)
 		this._rebuildConfigMap();
+
+		// Load the initial workspace configuration
+		this._onConfigChanged();
 	}
 
 	public dispose(): void {
@@ -72,6 +83,10 @@ class DocumentWatcher implements IEditorConfigProvider {
 		document: TextDocument
 	): editorconfig.knownProps {
 		return this._documentToConfigMap[document.fileName];
+	}
+
+	public getDefaultSettings(): EditorSettings {
+		return this._defaults;
 	}
 
 	private _rebuildConfigMap(): void {
@@ -86,7 +101,6 @@ class DocumentWatcher implements IEditorConfigProvider {
 			// Does not have a fs path
 			return;
 		}
-
 		const path = document.fileName;
 
 		if (this._documentToConfigMap[path]) {
@@ -105,6 +119,13 @@ class DocumentWatcher implements IEditorConfigProvider {
 			applyEditorConfigToTextEditor(window.activeTextEditor, this);
 		});
 	}
+
+	private _onConfigChanged(): void {
+		this._defaults = {
+			tabSize: workspace.getConfiguration('editor').get<string | number>('tabSize'),
+			insertSpaces: workspace.getConfiguration('editor').get<string | boolean>('insertSpaces')
+		};
+	}
 }
 
 function applyEditorConfigToTextEditor(
@@ -116,10 +137,6 @@ function applyEditorConfigToTextEditor(
 		return;
 	}
 
-	if (!defaults) {
-		defaults = textEditor.options;
-	}
-
 	const doc = textEditor.document;
 	const editorconfig = provider.getSettingsForDocument(doc);
 
@@ -128,18 +145,9 @@ function applyEditorConfigToTextEditor(
 		return;
 	}
 
-	const { insertSpaces, tabSize } = defaults;
-	const newOptions = Utils.fromEditorConfig(
-		editorconfig,
-		{
-			insertSpaces,
-			tabSize
-		}
-	);
+	const newOptions: any = Utils.fromEditorConfig(editorconfig, provider.getDefaultSettings());
 
-	// console.log('setting ' + textEditor.document.fileName + ' to ' + JSON.stringify(newOptions, null, '\t'));
-
-	const spacesOrTabs = (newOptions.insertSpaces) ? 'Spaces' : 'Tabs';
+	const spacesOrTabs = newOptions.insertSpaces === 'auto' ? 'auto' : (newOptions.insertSpaces ? 'Spaces' : 'Tabs');
 	window.setStatusBarMessage(
 		`EditorConfig: ${spacesOrTabs}: ${newOptions.tabSize}`,
 		1500
@@ -310,11 +318,8 @@ export class Utils {
 	 */
 	public static fromEditorConfig(
 		config: editorconfig.knownProps,
-		defaults: {
-			insertSpaces: boolean;
-			tabSize: number;
-		}
-	): TextEditorOptions {
+		defaults: EditorSettings
+	): any {
 		return {
 			insertSpaces: config.indent_style
 				? config.indent_style !== 'tab'
