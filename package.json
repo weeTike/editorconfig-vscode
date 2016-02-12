@@ -4,7 +4,7 @@
   "description": "EditorConfig Support for Visual Studio Code",
   "publisher": "EditorConfig",
   "version": "0.2.2",
-  "icon": "./EditorConfig_icon.png",
+  "icon": "EditorConfig_icon.png",
   "engines": {
     "vscode": "^0.10.6"
   },
