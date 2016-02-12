@@ -1,3 +1,6 @@
+## 0.2.2
+- [Fix defaults](https://github.com/editorconfig/editorconfig-vscode/issues/3) (thanks [`@SamVerschueren`](https://github.com/SamVerschueren))!
+
 ## 0.2.1
 - [Trim trailing whitespace before inserting final newline](https://github.com/editorconfig/editorconfig-vscode/issues/2) (thanks [`@SamVerschueren`](https://github.com/SamVerschueren))!
 
