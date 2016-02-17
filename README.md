@@ -1,6 +1,10 @@
 # EditorConfig for [Visual Studio Code][]
+[![Travis Build Status][travis-img]][travis] [![Gitter][chat-img]][chat]
 
-[![Build Status](https://travis-ci.org/editorconfig/editorconfig-vscode.svg?branch=master)](https://travis-ci.org/editorconfig/editorconfig-vscode)
+[travis]: https://travis-ci.org/editorconfig/editorconfig-vscode.svg?branch=master
+[travis-img]: https://img.shields.io/travis/editorconfig/editorconfig-vscode.svg?label=OSX/Linux
+[chat-img]: https://img.shields.io/badge/Gitter-Join_the_EditorConfig_VSCode_chat-brightgreen.svg
+[chat]: https://gitter.im/editorconfig/editorconfig-vscode
 
 Forked from [`Microsoft/vscode-editorconfig`](https://github.com/Microsoft/vscode-editorconfig), which Microsoft [has now deprecated](https://github.com/Microsoft/vscode-editorconfig/issues/23) in favor of this one. If you are using the Microsoft extension (published by [`Chris Dias`](https://github.com/chrisdias)), please uninstall it before installing this one.
 
