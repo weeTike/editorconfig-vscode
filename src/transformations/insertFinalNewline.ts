@@ -1,6 +1,9 @@
 import * as editorconfig from 'editorconfig';
-import {TextEditor, TextDocument, Position} from 'vscode';
-import {EditorSettings} from '../interfaces/editorSettings';
+import {
+	TextEditor,
+	TextDocument,
+	Position
+} from 'vscode';
 
 const lineEndings = {
 	cr: '\r',
@@ -10,7 +13,11 @@ const lineEndings = {
 /**
  * Transform the textdocument by inserting a final newline.
  */
-export function transform(editorconfig: editorconfig.knownProps, editor: TextEditor, textDocument: TextDocument): Thenable<any> {
+export function transform(
+	editorconfig: editorconfig.knownProps,
+	editor: TextEditor,
+	textDocument: TextDocument
+): Thenable<boolean|void> {
 	const lineCount = textDocument.lineCount;
 
 	if (!editorconfig.insert_final_newline || lineCount === 0) {
@@ -30,7 +37,7 @@ export function transform(editorconfig: editorconfig.knownProps, editor: TextEdi
 	});
 }
 
-function newline(editorconfig: editorconfig.knownProps): string {
+function newline(editorconfig: editorconfig.knownProps) {
 	if (!editorconfig.end_of_line) {
 		return '\n';
 	}

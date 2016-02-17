@@ -1,6 +1,5 @@
 import * as assert from 'assert';
-import * as vscode from 'vscode';
-import {Utils} from '../src/utils';
+import Utils from '../src/utils';
 
 suite('.editorconfig extension', () => {
 
@@ -164,7 +163,10 @@ suite('.editorconfig extension', () => {
 				}
 			}
 		].forEach(({ config, defaults, expected }) => {
-			assert.deepEqual(Utils.fromEditorConfig.call(this, config, defaults), expected);
+			assert.deepEqual(
+				Utils.fromEditorConfig.call(this, config, defaults),
+				expected
+			);
 		});
 	});
 
