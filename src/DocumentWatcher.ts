@@ -129,7 +129,7 @@ class DocumentWatcher implements EditorConfigProvider {
 
 function applyOnSaveTransformations(
 	textDocument: TextDocument,
-	provider: IEditorConfigProvider
+	provider: EditorConfigProvider
 ) {
 	const editorconfig = provider.getSettingsForDocument(textDocument);
 
@@ -151,7 +151,7 @@ function applyOnSaveTransformations(
 
 function applyEditorConfigToTextEditor(
 	textEditor: TextEditor,
-	provider: IEditorConfigProvider
+	provider: EditorConfigProvider
 ) {
 	if (!textEditor) {
 		// No more open editors
