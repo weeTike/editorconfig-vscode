@@ -1,7 +1,5 @@
 import * as editorconfig from 'editorconfig';
-import {
-	basename
-} from 'path';
+import * as path from 'path';
 import {
 	window,
 	workspace,
@@ -50,7 +48,7 @@ export default class DocumentWatcher implements IEditorConfigProvider {
 
 		// Listen for saves to ".editorconfig" files and rebuild the map
 		subscriptions.push(workspace.onDidSaveTextDocument(savedDocument => {
-			if (basename(savedDocument.fileName) === '.editorconfig') {
+			if (path.basename(savedDocument.fileName) === '.editorconfig') {
 				// Saved an .editorconfig file => rebuild map entirely and then
 				// apply the changes to the .editorconfig file itself
 				this._rebuildConfigMap().then(applyOnSaveTransformations.bind(
