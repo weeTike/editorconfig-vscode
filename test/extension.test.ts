@@ -1,7 +1,7 @@
 'use strict';
 
 import * as assert from 'assert';
-import Utils from '../src/utils';
+import Utils from '../src/Utils';
 
 suite('.editorconfig extension', () => {
 

@@ -4,7 +4,7 @@ import {
 	ExtensionContext,
 	commands
 } from 'vscode';
-import DocumentWatcher from './documentWatcher';
+import DocumentWatcher from './DocumentWatcher';
 import {
 	generateEditorConfig
 } from './commands/generateEditorConfig';
