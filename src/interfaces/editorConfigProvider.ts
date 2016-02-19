@@ -5,7 +5,7 @@ import {
 	TextDocument
 } from 'vscode';
 
-export interface IEditorConfigProvider {
+export interface EditorConfigProvider {
 	getSettingsForDocument(document: TextDocument): editorconfig.knownProps;
 	getDefaultSettings();
 }
