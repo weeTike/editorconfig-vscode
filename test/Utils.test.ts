@@ -1,9 +1,9 @@
 'use strict';
 
 import * as assert from 'assert';
-import Utils from '../src/Utils';
+import * as Utils from '../src/Utils';
 
-suite('.editorconfig extension', () => {
+suite('EditorConfig extension', () => {
 
 	// Defines a Mocha unit test
 	test('Utils.fromEditorConfig', () => {

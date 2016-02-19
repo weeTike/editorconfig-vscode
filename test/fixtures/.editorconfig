@@ -1,0 +1,25 @@
+root = true
+
+[tab-width-2]
+indent_style = tab
+tab_width = 2
+
+[tab-width-3]
+indent_style = tab
+tab_width = 3
+
+[tab-width-4]
+indent_style = tab
+tab_width = 4
+
+[indent-size-2]
+indent_style = space
+indent_size = 2
+
+[indent-size-3]
+indent_style = space
+indent_size = 3
+
+[indent-size-4]
+indent_style = space
+indent_size = 4
