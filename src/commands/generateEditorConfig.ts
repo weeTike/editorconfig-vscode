@@ -1,7 +1,4 @@
-import {
-	exists,
-	writeFile
-} from 'fs';
+import * as fs from 'fs';
 import * as path from 'path';
 import {
 	workspace,
@@ -25,7 +22,7 @@ export function generateEditorConfig() {
 
 	const editorconfigFile = path.join(workspace.rootPath, '.editorconfig');
 
-	exists(editorconfigFile, exists => {
+	fs.exists(editorconfigFile, exists => {
 		if (exists) {
 			window.showInformationMessage(
 				'A .editorconfig file already exists in your workspace.'
@@ -49,7 +46,7 @@ export function generateEditorConfig() {
 			}
 		});
 
-		writeFile(editorconfigFile, fileContents.join('\n'), err => {
+		fs.writeFile(editorconfigFile, fileContents.join('\n'), err => {
 			if (err) {
 				window.showErrorMessage(err.toString());
 				return;
