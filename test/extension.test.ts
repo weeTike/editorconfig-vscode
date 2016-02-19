@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as vscode from 'vscode';
-import {Utils} from '../src/editorConfigMain';
+import {Utils} from '../src/utils';
 
 suite('.editorconfig extension', () => {
 
