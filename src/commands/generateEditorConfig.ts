@@ -1,16 +1,25 @@
-import {exists, writeFile} from 'fs';
+import {
+	exists,
+	writeFile
+} from 'fs';
 import * as path from 'path';
-import {workspace, window} from 'vscode';
-import {Utils} from '../utils';
+import {
+	workspace,
+	window
+} from 'vscode';
+import Utils from '../utils';
 
 const propsToGenerate = ['indent_style', 'indent_size', 'tab_width'];
 
 /**
- * Generate an .editorconfig file in the root of the workspace based on the current vscode settings.
+ * Generate an .editorconfig file in the root of the workspace based on the
+ * current vscode settings.
  */
 export function generateEditorConfig() {
 	if (!workspace.rootPath) {
-		window.showInformationMessage('Please open a folder before generating an .editorconfig file');
+		window.showInformationMessage(
+			'Please open a folder before generating an .editorconfig file'
+		);
 		return;
 	}
 
@@ -18,14 +27,18 @@ export function generateEditorConfig() {
 
 	exists(editorconfigFile, exists => {
 		if (exists) {
-			window.showInformationMessage('A .editorconfig file already exists in your workspace.');
+			window.showInformationMessage(
+				'A .editorconfig file already exists in your workspace.'
+			);
 			return;
 		}
 
 		const editorConfigurationNode = workspace.getConfiguration('editor');
 		const settings = Utils.toEditorConfig({
-			insertSpaces: editorConfigurationNode.get<string | boolean>('insertSpaces'),
-			tabSize: editorConfigurationNode.get<string | number>('tabSize')
+			insertSpaces: editorConfigurationNode
+				.get<string | boolean>('insertSpaces'),
+			tabSize: editorConfigurationNode
+				.get<string | number>('tabSize')
 		});
 
 		let fileContents = ['root = true', '', '[*]'];

@@ -1,16 +1,29 @@
 import * as editorconfig from 'editorconfig';
-import {EditorSettings} from './interfaces/editorSettings';
-import {window, workspace, TextDocument, TextEditor} from 'vscode';
+import {
+	EditorSettings
+} from './interfaces/editorSettings';
+import {
+	window,
+	TextDocument,
+	TextEditor
+} from 'vscode';
 
-export class Utils {
+export default class Utils {
 
 	/**
 	 * Convert .editorconfig values to vscode editor options
 	 */
-	public static fromEditorConfig(config: editorconfig.knownProps, defaults: EditorSettings): any {
+	public static fromEditorConfig(
+		config: editorconfig.knownProps,
+		defaults: EditorSettings
+	): EditorSettings {
 		return {
-			insertSpaces: config.indent_style ? config.indent_style !== 'tab' : defaults.insertSpaces,
-			tabSize: config.tab_width || config.indent_size || defaults.tabSize
+			insertSpaces: config.indent_style
+				? config.indent_style !== 'tab'
+				: defaults.insertSpaces,
+			tabSize: config.tab_width
+				|| config.indent_size
+				|| defaults.tabSize
 		};
 	}
 
