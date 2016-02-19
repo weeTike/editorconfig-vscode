@@ -8,10 +8,14 @@ import {
 } from 'vscode';
 import * as Utils from '../Utils';
 
-const propsToGenerate = ['indent_style', 'indent_size', 'tab_width'];
+const propsToGenerate = [
+	'indent_style',
+	'indent_size',
+	'tab_width'
+];
 
 /**
- * Generate an .editorconfig file in the root of the workspace based on the
+ * Generate a .editorconfig file in the root of the workspace based on the
  * current vscode settings.
  */
 export function generateEditorConfig() {
@@ -22,16 +26,33 @@ export function generateEditorConfig() {
 		return;
 	}
 
-	const editorconfigFile = path.join(workspace.rootPath, '.editorconfig');
+	const editorConfigFile = path.join(workspace.rootPath, '.editorconfig');
 
-	fs.exists(editorconfigFile, exists => {
-		if (exists) {
-			window.showInformationMessage(
+	fs.stat(editorConfigFile, (err, stats) => {
+		if (err) {
+			window.showErrorMessage(err.message);
+			return;
+		}
+
+		if (stats.isFile()) {
+			window.showErrorMessage(
 				'A .editorconfig file already exists in your workspace.'
 			);
 			return;
 		}
 
+		fs.access(editorConfigFile, fs.W_OK, accessError => {
+			if (accessError) {
+				window.showErrorMessage('No write access.');
+				return;
+			}
+
+			writeFile();
+		});
+	});
+
+	function writeFile() {
+		const contents = ['root = true', '', '[*]'];
 		const editorConfigurationNode = workspace.getConfiguration('editor');
 		const settings = Utils.toEditorConfig({
 			insertSpaces: editorConfigurationNode
@@ -40,19 +61,17 @@ export function generateEditorConfig() {
 				.get<string | number>('tabSize')
 		});
 
-		let fileContents = ['root = true', '', '[*]'];
-
-		propsToGenerate.forEach(setting => {
+		for (const setting of propsToGenerate) {
 			if (settings.hasOwnProperty(setting)) {
-				fileContents.push(`${setting} = ${settings[setting]}`);
+				contents.push(`${setting} = ${settings[setting]}`);
 			}
-		});
+		}
 
-		fs.writeFile(editorconfigFile, fileContents.join('\n'), err => {
+		fs.writeFile(editorConfigFile, contents.join('\n'), err => {
 			if (err) {
-				window.showErrorMessage(err.toString());
+				window.showErrorMessage(err.message);
 				return;
 			}
 		});
-	});
+	}
 }
