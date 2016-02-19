@@ -17,7 +17,7 @@ import {
 	transform as insertFinalNewlineTransform
 } from './transformations/insertFinalNewline';
 import {
-	IEditorConfigProvider
+	EditorConfigProvider
 } from './interfaces/editorConfigProvider';
 import {
 	EditorSettings
@@ -27,7 +27,7 @@ import {
  * Listens to vscode document open and maintains a map
  * (Document => editor config settings)
  */
-class DocumentWatcher implements IEditorConfigProvider {
+class DocumentWatcher implements EditorConfigProvider {
 
 	private _documentToConfigMap: { [uri: string]: editorconfig.knownProps };
 	private _disposable: Disposable;
