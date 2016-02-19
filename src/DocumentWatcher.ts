@@ -9,7 +9,7 @@ import {
 	TextDocument,
 	TextEditor
 } from 'vscode';
-import Utils from './utils';
+import Utils from './Utils';
 import {
 	transform as trimTrailingWhitespaceTransform
 } from './transformations/trimTrailingWhitespace';

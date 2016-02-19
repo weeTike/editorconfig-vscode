@@ -6,7 +6,7 @@ import {
 	workspace,
 	window
 } from 'vscode';
-import Utils from '../utils';
+import Utils from '../Utils';
 
 const propsToGenerate = ['indent_style', 'indent_size', 'tab_width'];
 
