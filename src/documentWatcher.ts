@@ -1,3 +1,5 @@
+'use strict';
+
 import * as editorconfig from 'editorconfig';
 import * as path from 'path';
 import {
@@ -25,7 +27,7 @@ import {
  * Listens to vscode document open and maintains a map
  * (Document => editor config settings)
  */
-export default class DocumentWatcher implements IEditorConfigProvider {
+class DocumentWatcher implements IEditorConfigProvider {
 
 	private _documentToConfigMap: { [uri: string]: editorconfig.knownProps };
 	private _disposable: Disposable;
@@ -62,7 +64,7 @@ export default class DocumentWatcher implements IEditorConfigProvider {
 		}));
 
 		// dispose event subscriptons upon disposal
-		this._disposable = Disposable.from(...subscriptions);
+		this._disposable = Disposable.from.apply(this, subscriptions);
 
 		// Build the map (cover the case that documents were opened before
 		// my activation)
@@ -182,3 +184,4 @@ function applyEditorConfigToTextEditor(
 	/* tslint:enable */
 }
 
+export default DocumentWatcher;

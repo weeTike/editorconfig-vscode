@@ -1,3 +1,5 @@
+'use strict';
+
 import * as editorconfig from 'editorconfig';
 import {
 	EditorSettings
@@ -8,12 +10,12 @@ import {
 	TextEditor
 } from 'vscode';
 
-export default class Utils {
+module Utils {
 
 	/**
 	 * Convert .editorconfig values to vscode editor options
 	 */
-	public static fromEditorConfig(
+	export function fromEditorConfig(
 		config: editorconfig.knownProps,
 		defaults: EditorSettings
 	): EditorSettings {
@@ -30,7 +32,7 @@ export default class Utils {
 	/**
 	 * Convert vscode editor options to .editorconfig values
 	 */
-	public static toEditorConfig(options: EditorSettings) {
+	export function toEditorConfig(options: EditorSettings) {
 		const result: editorconfig.knownProps = {};
 
 		switch (options.insertSpaces) {
@@ -51,14 +53,14 @@ export default class Utils {
 	/**
 	 * Convert vscode tabSize option into numeric value
 	 */
-	public static resolveTabSize(tabSize: number|string) {
+	export function resolveTabSize(tabSize: number|string) {
 		return (tabSize === 'auto') ? 4 : parseInt(String(tabSize), 10);
 	}
 
 	/**
 	 * Retrieve the current active text editor.
 	 */
-	public static findEditor(textDocument: TextDocument): TextEditor {
+	export function findEditor(textDocument: TextDocument): TextEditor {
 		for (const editor of window.visibleTextEditors) {
 			if (editor.document === textDocument) {
 				return editor;
@@ -68,3 +70,5 @@ export default class Utils {
 		return null;
 	}
 }
+
+export default Utils;

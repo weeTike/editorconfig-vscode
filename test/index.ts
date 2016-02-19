@@ -1,3 +1,5 @@
+'use strict';
+
 const testRunner = require('vscode/lib/testrunner');
 
 testRunner.configure({

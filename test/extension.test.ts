@@ -1,3 +1,5 @@
+'use strict';
+
 import * as assert from 'assert';
 import Utils from '../src/utils';
 
@@ -162,10 +164,14 @@ suite('.editorconfig extension', () => {
 					tabSize: 4
 				}
 			}
-		].forEach(({ config, defaults, expected }) => {
+		].forEach(scenario => {
 			assert.deepEqual(
-				Utils.fromEditorConfig.call(this, config, defaults),
-				expected
+				Utils.fromEditorConfig.call(
+					this,
+					scenario.config,
+					scenario.defaults
+				),
+				scenario.expected
 			);
 		});
 	});
@@ -222,8 +228,14 @@ suite('.editorconfig extension', () => {
 					tab_width: 4
 				}
 			}
-		].forEach(({ options, expected }) => {
-			assert.deepEqual(Utils.toEditorConfig.call(this, options), expected);
+		].forEach(scenario => {
+			assert.deepEqual(
+				Utils.toEditorConfig.call(
+					this,
+					scenario.options
+				),
+				scenario.expected
+			);
 		});
 	});
 });
