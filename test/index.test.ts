@@ -2,9 +2,6 @@
 
 import * as assert from 'assert';
 import {
-	workspace
-} from 'vscode';
-import {
 	cleanUpWorkspace,
 	getOptionsForFixture
 } from './testUtils';
@@ -13,16 +10,9 @@ suite('EditorConfig extension', () => {
 
 	suiteTeardown(cleanUpWorkspace);
 
-	const workspaceConfigNode = workspace.getConfiguration('editor');
-	const workspaceConfig = {
-		insertSpaces: <boolean | string> workspaceConfigNode.get('insertSpaces'),
-		tabSize: <number | string> workspaceConfigNode.get('tabSize')
-	};
-
 	test('indent_style: tab, tab_width: n', async () => {
-		for (const n of [2, 3, 4, 'x']) {
+		for (const n of [2, 3, 4]) {
 			const options = await getOptionsForFixture([`tab-width-${n}`]);
-			const expectedTabSize = (n === 'x') ? workspaceConfig.tabSize : n;
 			assert.strictEqual(
 				options.insertSpaces,
 				false,
@@ -30,8 +20,8 @@ suite('EditorConfig extension', () => {
 			);
 			assert.strictEqual(
 				options.tabSize,
-				expectedTabSize,
-				`editor has a tabSize of ${expectedTabSize}`
+				n,
+				`editor has a tabSize of ${n}`
 			);
 		}
 	});
