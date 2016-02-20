@@ -27,17 +27,16 @@ export async function getOptionsForFixture(file: string[]) {
 
 	assert.ok(window.activeTextEditor);
 
-	let textEditorOptions: TextEditorOptions;
-	await new Promise(resolve => {
+	return await getTextEditorOptions();
+}
+
+async function getTextEditorOptions() {
+	return new Promise<TextEditorOptions>(resolve => {
 		window.onDidChangeTextEditorOptions(e => {
-			textEditorOptions = e.options;
-			resolve();
+			assert.ok(e.options);
+			resolve(e.options);
 		});
 	});
-
-	assert.ok(textEditorOptions);
-
-	return textEditorOptions;
 }
 
 export async function cleanUpWorkspace() {
