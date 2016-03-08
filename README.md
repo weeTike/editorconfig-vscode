@@ -1,8 +1,8 @@
 # EditorConfig for [Visual Studio Code][]
 [![Travis Build Status][travis-img]][travis] [![Gitter][chat-img]][chat]
 
-[travis]: https://travis-ci.org/editorconfig/editorconfig-vscode.svg?branch=master
-[travis-img]: https://img.shields.io/travis/editorconfig/editorconfig-vscode.svg?label=OSX/Linux
+[travis]: https://travis-ci.org/editorconfig/editorconfig-vscode
+[travis-img]: https://travis-ci.org/editorconfig/editorconfig-vscode.svg?branch=master
 [chat-img]: https://img.shields.io/badge/Gitter-Join_the_EditorConfig_VSCode_chat-brightgreen.svg
 [chat]: https://gitter.im/editorconfig/editorconfig-vscode
 

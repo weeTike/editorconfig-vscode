@@ -31,11 +31,22 @@ export async function getOptionsForFixture(file: string[]) {
 }
 
 async function getTextEditorOptions() {
+	let resolved = false;
+
 	return new Promise<TextEditorOptions>(resolve => {
 		window.onDidChangeTextEditorOptions(e => {
+			resolved = true;
 			assert.ok(e.options);
 			resolve(e.options);
 		});
+
+		setTimeout(() => {
+			if (resolved) {
+				return;
+			}
+			assert.ok(window.activeTextEditor.options);
+			resolve(window.activeTextEditor.options);
+		}, 100);
 	});
 }
 
