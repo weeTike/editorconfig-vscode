@@ -6,7 +6,7 @@
   "version": "0.2.3",
   "icon": "EditorConfig_icon.png",
   "engines": {
-    "vscode": "^0.10.1"
+    "vscode": "^0.10.10"
   },
   "author": "EditorConfig Team",
   "license": "MIT",
@@ -43,13 +43,14 @@
   "devDependencies": {
     "tslint": "^3.3.0",
     "typescript": "^1.7.5",
-    "vscode": "^0.10.1"
+    "vscode": "^0.11.6"
   },
   "scripts": {
-    "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
-    "compile": "node ./node_modules/vscode/bin/compile -watch -p ./",
-    "pretest": "npm run lint",
+    "compile": "node ./node_modules/vscode/bin/compile",
+    "compile:w": "node ./node_modules/vscode/bin/compile -watch -p ./",
+    "pretest": "npm run compile",
+    "test": "npm run lint && node ./node_modules/vscode/bin/test",
     "lint": "tslint ./src/**/*.ts ./test/**/*.ts",
-    "test": "node ./node_modules/vscode/bin/test"
+    "postinstall": "node ./node_modules/vscode/bin/install"
   }
 }
