@@ -58,5 +58,4 @@ suite('EditorConfig extension', () => {
 			);
 		}
 	});
-
 });

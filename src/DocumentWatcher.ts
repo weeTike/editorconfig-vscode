@@ -7,7 +7,8 @@ import {
 	workspace,
 	Disposable,
 	TextDocument,
-	TextEditor
+	TextEditor,
+	TextEditorOptions
 } from 'vscode';
 import * as Utils from './Utils';
 import {
@@ -19,9 +20,6 @@ import {
 import {
 	EditorConfigProvider
 } from './interfaces/editorConfigProvider';
-import {
-	EditorSettings
-} from './interfaces/editorSettings';
 
 /**
  * Listens to vscode document open and maintains a map
@@ -31,7 +29,7 @@ class DocumentWatcher implements EditorConfigProvider {
 
 	private _documentToConfigMap: { [uri: string]: editorconfig.knownProps };
 	private _disposable: Disposable;
-	private _defaults: EditorSettings;
+	private _defaults: TextEditorOptions;
 
 	constructor() {
 		const subscriptions: Disposable[] = [];

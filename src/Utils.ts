@@ -2,12 +2,10 @@
 
 import * as editorconfig from 'editorconfig';
 import {
-	EditorSettings
-} from './interfaces/editorSettings';
-import {
 	window,
 	TextDocument,
-	TextEditor
+	TextEditor,
+	TextEditorOptions
 } from 'vscode';
 
 /**
@@ -15,8 +13,8 @@ import {
  */
 export function fromEditorConfig(
 	config: editorconfig.knownProps,
-	defaults: EditorSettings
-): EditorSettings {
+	defaults: TextEditorOptions
+): TextEditorOptions {
 	return {
 		insertSpaces: config.indent_style
 			? config.indent_style !== 'tab'
@@ -30,7 +28,7 @@ export function fromEditorConfig(
 /**
  * Convert vscode editor options to .editorconfig values
  */
-export function toEditorConfig(options: EditorSettings) {
+export function toEditorConfig(options: TextEditorOptions) {
 	const result: editorconfig.knownProps = {};
 
 	switch (options.insertSpaces) {
