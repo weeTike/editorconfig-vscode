@@ -3,31 +3,27 @@
 import * as assert from 'assert';
 import * as path from 'path';
 import {
-	commands,
 	TextEditorOptions,
-	window,
-	workspace
+	window
 } from 'vscode';
+import * as utils from 'vscode-test-utils';
 
 export async function getOptionsForFixture(file: string[]) {
-	await window.showTextDocument(
-		await workspace.openTextDocument(
-			path.join.apply(
-				this,
-				[
-					__dirname,
-					'..',
-					'..',
-					'test',
-					'fixtures'
-				].concat(file)
-			)
-		)
-	);
-
-	assert.ok(window.activeTextEditor);
-
+	await utils.openFile(getFixturePath(file));
 	return await getTextEditorOptions();
+}
+
+export function getFixturePath(file: string[]) {
+	return path.join.apply(
+		this,
+		[
+			__dirname,
+			'..',
+			'..',
+			'test',
+			'fixtures'
+		].concat(file)
+	);
 }
 
 async function getTextEditorOptions() {
@@ -47,32 +43,5 @@ async function getTextEditorOptions() {
 			assert.ok(window.activeTextEditor.options);
 			resolve(window.activeTextEditor.options);
 		}, 100);
-	});
-}
-
-export async function cleanUpWorkspace() {
-	return new Promise((resolve, reject) => {
-		if (window.visibleTextEditors.length === 0) {
-			return resolve();
-		}
-
-		const interval = setInterval(() => {
-			if (window.visibleTextEditors.length > 0) {
-				return;
-			}
-
-			clearInterval(interval);
-			resolve();
-		}, 10);
-
-		commands.executeCommand('workbench.action.closeAllEditors')
-			.then(() => commands.executeCommand('workbench.files.action.closeAllFiles'))
-			.then(null, err => {
-				clearInterval(interval);
-				reject(err);
-			});
-	}).then(() => {
-		assert.equal(window.visibleTextEditors.length, 0);
-		assert(!window.activeTextEditor);
 	});
 }
