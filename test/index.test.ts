@@ -2,6 +2,13 @@
 
 import * as assert from 'assert';
 import {
+	Position,
+	window,
+	workspace,
+	WorkspaceEdit
+} from 'vscode';
+import {
+	getFixturePath,
 	getOptionsForFixture
 } from './testUtils';
 
@@ -60,4 +67,79 @@ suite('EditorConfig extension', () => {
 		}
 	});
 
+	test('insert_final_newline = true', async () => {
+		const savedText = await withSetting(
+			'insert_final_newline',
+			'true',
+			{ saves: 2 }
+		).saveText('foo');
+		assert.strictEqual(savedText, 'foo\n',
+			'editor inserts final newline on save');
+	});
+
+	test('insert_final_newline = false', async () => {
+		const savedText = await withSetting(
+			'insert_final_newline',
+			'false'
+		).saveText('foo\n');
+		assert.strictEqual(savedText, 'foo\n',
+			'editor preserves final newline on save');
+	});
+
+	test('trim_trailing_whitespace = true', async () => {
+		const savedText = await withSetting(
+			'trim_trailing_whitespace',
+			'true',
+			{ saves: 2 }
+		).saveText('foo  ');
+		assert.strictEqual(savedText, 'foo',
+			'editor trims trailing whitespace on save');
+	});
+
+	test('trim_trailing_whitespace = false', async () => {
+		const savedText = await withSetting(
+			'trim_trailing_whitespace',
+			'false'
+		).saveText('foo  ');
+		assert.strictEqual(savedText, 'foo  ',
+			'editor preserves trailing whitespace on save');
+	});
+
 });
+
+function withSetting(
+	rule: string,
+	value: string,
+	options?: {
+		saves?: number;
+	}
+) {
+	options = options || {};
+	return {
+		saveText: async (text: string) => {
+			const filename = await utils.createFile('', getFixturePath([
+				rule,
+				value,
+				'test'
+			]));
+			const doc = await workspace.openTextDocument(filename);
+			await window.showTextDocument(doc);
+			const edit = new WorkspaceEdit();
+			edit.insert(doc.uri, new Position(0, 0), text);
+			assert.strictEqual(
+				await workspace.applyEdit(edit),
+				true,
+				'applies edit'
+			);
+			return await new Promise(resolve => {
+				let saveCount = 0;
+				workspace.onDidSaveTextDocument(savedDoc => {
+					if (++saveCount === (options.saves || 1)) {
+						resolve(savedDoc.getText());
+					}
+				});
+				doc.save();
+			});
+		}
+	};
+}
