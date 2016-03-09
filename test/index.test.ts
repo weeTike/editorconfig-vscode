@@ -2,15 +2,16 @@
 
 import * as assert from 'assert';
 import {
-	cleanUpWorkspace,
 	getOptionsForFixture
 } from './testUtils';
 
+import * as utils from 'vscode-test-utils';
+
 suite('EditorConfig extension', () => {
 
-	suiteTeardown(cleanUpWorkspace);
+	suiteTeardown(utils.closeAllFiles);
 
-	test('indent_style: tab, tab_width: n', async () => {
+	test('indent_style = tab; tab_width = n', async () => {
 		for (const n of [2, 3, 4]) {
 			const options = await getOptionsForFixture([`tab-width-${n}`]);
 			assert.strictEqual(
@@ -26,7 +27,7 @@ suite('EditorConfig extension', () => {
 		}
 	});
 
-	test('indent_style: space, indent_size: n', async () => {
+	test('indent_style = space; indent_size = n', async () => {
 		for (const n of [2, 3, 4]) {
 			const options = await getOptionsForFixture([`indent-size-${n}`]);
 			assert.strictEqual(
@@ -58,4 +59,5 @@ suite('EditorConfig extension', () => {
 			);
 		}
 	});
+
 });
