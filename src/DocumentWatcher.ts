@@ -168,14 +168,6 @@ function applyEditorConfigToTextEditor(
 		editorconfig,
 		provider.getDefaultSettings()
 	);
-	const spacesOrTabs = newOptions.insertSpaces === 'auto'
-		? 'auto'
-		: (newOptions.insertSpaces ? 'Spaces' : 'Tabs');
-
-	window.setStatusBarMessage(
-		`EditorConfig: ${spacesOrTabs}: ${newOptions.tabSize}`,
-		1500
-	);
 
 	/* tslint:disable:no-any */
 	textEditor.options = <any> newOptions;
