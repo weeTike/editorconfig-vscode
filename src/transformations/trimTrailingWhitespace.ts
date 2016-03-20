@@ -17,7 +17,7 @@ export function transform(
 	editorconfig: editorconfig.knownProps,
 	editor: TextEditor,
 	textDocument: TextDocument
-): Thenable<void|boolean[]> {
+): Thenable<void | Thenable<boolean>[]> {
 	const editorTrimsWhitespace = workspace
 		.getConfiguration('files')
 		.get('trimTrailingWhitespace', false);
@@ -36,7 +36,7 @@ export function transform(
 
 	return Promise.all(trimmingOperations);
 
-	function trimLineTrailingWhitespace(line: TextLine) {
+	function trimLineTrailingWhitespace(line: TextLine): Thenable<boolean> {
 		const trimmedLine = trimTrailingWhitespace(line.text);
 		if (trimmedLine === line.text) {
 			return;
