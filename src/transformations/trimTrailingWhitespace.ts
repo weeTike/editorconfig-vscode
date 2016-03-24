@@ -3,6 +3,7 @@
 import * as editorconfig from 'editorconfig';
 import {
 	workspace,
+	window,
 	TextEditor,
 	TextDocument,
 	TextLine,
@@ -17,10 +18,17 @@ export function transform(
 	editorconfig: editorconfig.knownProps,
 	editor: TextEditor,
 	textDocument: TextDocument
-): Thenable<void | Thenable<boolean>[]> {
+): Thenable<void | string | Thenable<boolean>[]> {
 	const editorTrimsWhitespace = workspace
 		.getConfiguration('files')
 		.get('trimTrailingWhitespace', false);
+
+	if (editorTrimsWhitespace && !editorconfig.trim_trailing_whitespace) {
+		return window.showWarningMessage([
+			'The `trimTrailingWhitespace` workspace setting is',
+			'overriding the EditorConfig setting for this file.'
+		].join(' '));
+	}
 
 	if (editorTrimsWhitespace || !editorconfig.trim_trailing_whitespace) {
 		return Promise.resolve();
