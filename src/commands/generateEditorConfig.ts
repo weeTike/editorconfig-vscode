@@ -29,7 +29,12 @@ export function generateEditorConfig() {
 	const editorConfigFile = path.join(workspace.rootPath, '.editorconfig');
 
 	fs.stat(editorConfigFile, (err, stats) => {
+
 		if (err) {
+			if (err.code === 'ENOENT') {
+				writeFile();
+				return;
+			}
 			window.showErrorMessage(err.message);
 			return;
 		}
@@ -38,17 +43,7 @@ export function generateEditorConfig() {
 			window.showErrorMessage(
 				'A .editorconfig file already exists in your workspace.'
 			);
-			return;
 		}
-
-		fs.access(editorConfigFile, fs.W_OK, accessError => {
-			if (accessError) {
-				window.showErrorMessage('No write access.');
-				return;
-			}
-
-			writeFile();
-		});
 	});
 
 	function writeFile() {
