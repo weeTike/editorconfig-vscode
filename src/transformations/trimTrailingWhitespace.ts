@@ -24,12 +24,11 @@ export function transform(
 		.get('trimTrailingWhitespace', false);
 
 	if (editorTrimsWhitespace && !editorconfig.trim_trailing_whitespace) {
-		return window.showWarningMessage([
-			'The `trimTrailingWhitespace` workspace setting is',
+		window.showWarningMessage([
+			'The trimTrailingWhitespace workspace or user setting is',
 			'overriding the EditorConfig setting for this file.'
-		].join(' ')).then(() => {
-			return Promise.resolve([true]);
-		});
+		].join(' '));
+		return Promise.resolve([true]);
 	}
 
 	if (editorTrimsWhitespace || !editorconfig.trim_trailing_whitespace) {
@@ -44,7 +43,7 @@ export function transform(
 		);
 	}
 
-	return Promise.all(trimmingOperations);
+	return Promise.all<boolean>(trimmingOperations);
 
 	function trimLineTrailingWhitespace(line: TextLine): Thenable<boolean> {
 		const trimmedLine = trimTrailingWhitespace(line.text);
