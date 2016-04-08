@@ -23,15 +23,17 @@ export function transform(
 		.getConfiguration('files')
 		.get('trimTrailingWhitespace', false);
 
-	if (editorTrimsWhitespace && !editorconfig.trim_trailing_whitespace) {
-		window.showWarningMessage([
-			'The trimTrailingWhitespace workspace or user setting is',
-			'overriding the EditorConfig setting for this file.'
-		].join(' '));
+	if (editorTrimsWhitespace) {
+		if (editorconfig.trim_trailing_whitespace === false) {
+			window.showWarningMessage([
+				'The trimTrailingWhitespace workspace or user setting is',
+				'overriding the EditorConfig setting for this file.'
+			].join(' '));
+		}
 		return Promise.resolve([true]);
 	}
 
-	if (editorTrimsWhitespace || !editorconfig.trim_trailing_whitespace) {
+	if (!editorconfig.trim_trailing_whitespace) {
 		return Promise.resolve([true]);
 	}
 
