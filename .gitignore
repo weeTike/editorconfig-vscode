@@ -4,5 +4,6 @@ node_modules
 Thumbs.db
 *.log
 
+test/fixtures/end_of_line/*/test
 test/fixtures/insert_final_newline/*/test
 test/fixtures/trim_trailing_whitespace/*/test

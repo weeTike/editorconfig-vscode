@@ -6,17 +6,17 @@ import {
 	window,
 	workspace,
 	Disposable,
+	EndOfLine,
 	TextDocument,
 	TextEditor,
 	TextEditorOptions
 } from 'vscode';
 import * as Utils from './Utils';
 import {
-	transform as trimTrailingWhitespaceTransform
-} from './transformations/trimTrailingWhitespace';
-import {
-	transform as insertFinalNewlineTransform
-} from './transformations/insertFinalNewline';
+	endOfLineTransform,
+	trimTrailingWhitespaceTransform,
+	insertFinalNewlineTransform
+} from './transformations';
 import {
 	EditorConfigProvider
 } from './interfaces/editorConfigProvider';
@@ -111,7 +111,10 @@ class DocumentWatcher implements EditorConfigProvider {
 
 				this._documentToConfigMap[path] = config;
 
-				applyEditorConfigToTextEditor(window.activeTextEditor, this);
+				return applyEditorConfigToTextEditor(
+					window.activeTextEditor,
+					this
+				);
 			});
 	}
 
@@ -153,7 +156,7 @@ function applyEditorConfigToTextEditor(
 ) {
 	if (!textEditor) {
 		// No more open editors
-		return;
+		return Promise.resolve();
 	}
 
 	const doc = textEditor.document;
@@ -161,7 +164,7 @@ function applyEditorConfigToTextEditor(
 
 	if (!editorconfig) {
 		// no configuration found for this file
-		return;
+		return Promise.resolve();
 	}
 
 	const newOptions = Utils.fromEditorConfig(
@@ -172,6 +175,8 @@ function applyEditorConfigToTextEditor(
 	/* tslint:disable:no-any */
 	textEditor.options = <any> newOptions;
 	/* tslint:enable */
+
+	return endOfLineTransform(editorconfig, textEditor, doc);
 }
 
 export default DocumentWatcher;
