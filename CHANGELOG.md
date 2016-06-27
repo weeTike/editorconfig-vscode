@@ -1,3 +1,6 @@
+## 0.3.0
+- [Support `end_of_line`](https://github.com/editorconfig/editorconfig-vscode/issues/26) (thanks [`@jedmao`](https://github.com/jedmao))!
+
 ## 0.2.3
 - [Fix applying transformations to .editorconfig itself](https://github.com/editorconfig/editorconfig-vscode/issues/9) (thanks [`@SamVerschueren`](https://github.com/SamVerschueren))!
 - [Fix marketplace icon](https://github.com/editorconfig/editorconfig-vscode/commits/master) (thanks [`@SamVerschueren`](https://github.com/SamVerschueren))!
