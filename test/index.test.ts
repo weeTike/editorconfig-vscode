@@ -105,25 +105,81 @@ suite('EditorConfig extension', () => {
 			'editor preserves trailing whitespace on save');
 	});
 
+	test('end_of_line = lf', async (done) => {
+		const doc = await withSetting(
+			'end_of_line',
+			'lf',
+			{
+				contents: 'foo\r\n'
+			}
+		).doc;
+		setTimeout(() => {
+			assert.strictEqual(doc.getText(), 'foo\n',
+				'editor converts CRLF line endings into LF on open');
+			done();
+		}, 25);
+	});
+
+	test('end_of_line = crlf', async (done) => {
+		const doc = await withSetting(
+			'end_of_line',
+			'crlf',
+			{
+				contents: 'foo\n'
+			}
+		).doc;
+		setTimeout(() => {
+			assert.strictEqual(doc.getText(), 'foo\r\n',
+				'editor converts LF line endings into CRLF on open');
+			done();
+		}, 25);
+	});
+
+	test('end_of_line = preserve', async (done) => {
+		const doc = await withSetting(
+			'end_of_line',
+			'preserve',
+			{
+				contents: 'foo\r\n'
+			}
+		).doc;
+		setTimeout(() => {
+			assert.strictEqual(doc.getText(), 'foo\r\n',
+				'editor preserves CRLF line endings on open');
+			done();
+		}, 25);
+	});
+
+	test('end_of_line = undefined', async (done) => {
+		const doc = await withSetting(
+			'end_of_line',
+			'undefined',
+			{
+				contents: 'foo\r\n'
+			}
+		).doc;
+		setTimeout(() => {
+			assert.strictEqual(doc.getText(), 'foo\r\n',
+				'editor preserves CRLF line endings on open');
+			done();
+		}, 25);
+	});
+
 });
 
 function withSetting(
 	rule: string,
 	value: string,
 	options?: {
+		contents?: string;
 		saves?: number;
 	}
 ) {
 	options = options || {};
 	return {
+		doc: createDoc(options.contents),
 		saveText: async (text: string) => {
-			const filename = await utils.createFile('', getFixturePath([
-				rule,
-				value,
-				'test'
-			]));
-			const doc = await workspace.openTextDocument(filename);
-			await window.showTextDocument(doc);
+			const doc = await createDoc();
 			const edit = new WorkspaceEdit();
 			edit.insert(doc.uri, new Position(0, 0), text);
 			assert.strictEqual(
@@ -142,4 +198,15 @@ function withSetting(
 			});
 		}
 	};
+
+	async function createDoc(contents?: string) {
+		const filename = await utils.createFile(contents || '', getFixturePath([
+			rule,
+			value,
+			'test'
+		]));
+		const doc = await workspace.openTextDocument(filename);
+		await window.showTextDocument(doc);
+		return doc;
+	}
 }
