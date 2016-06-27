@@ -21,12 +21,12 @@ ext install EditorConfig
 * `indent_style`
 * `indent_size`
 * `tab_width`
+* `end_of_line`
 * `insert_final_newline`
 * `trim_trailing_whitespace`
 
 ## On the backlog
 
 * `charset`
-* `end_of_line`
 
 [Visual Studio Code]: https://code.visualstudio.com/
