@@ -1,6 +1,7 @@
 'use strict';
 
 import * as editorconfig from 'editorconfig';
+const get = require('lodash.get');
 import {
 	window,
 	TextDocument,
@@ -15,13 +16,20 @@ export function fromEditorConfig(
 	config: editorconfig.knownProps,
 	defaults: TextEditorOptions
 ): TextEditorOptions {
+	const resolved: TextEditorOptions = {
+		tabSize: (config.indent_style === 'tab'
+			? get(config, 'tab_width', config.indent_size)
+			: get(config, 'indent_size', config.tab_width)
+		)
+	};
+	if (get(resolved, 'tabSize') === 'tab') {
+		resolved.tabSize = config.tab_width;
+	}
 	return {
 		insertSpaces: config.indent_style
 			? config.indent_style !== 'tab'
 			: defaults.insertSpaces,
-		tabSize: config.tab_width
-			|| config.indent_size
-			|| defaults.tabSize
+		tabSize: get(resolved, 'tabSize', defaults.tabSize)
 	};
 }
 
