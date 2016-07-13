@@ -163,6 +163,18 @@ suite('EditorConfig extension', () => {
 					insertSpaces: true,
 					tabSize: 4
 				}
+			},
+			{
+				config: {
+					indent_size: 2,
+					indent_style: 'space',
+					tab_width: 4
+				},
+				defaults: {},
+				expected: {
+					insertSpaces: true,
+					tabSize: 2
+				}
 			}
 		].forEach(scenario => {
 			assert.deepEqual(

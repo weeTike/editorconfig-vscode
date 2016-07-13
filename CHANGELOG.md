@@ -1,3 +1,6 @@
+## 0.3.1
+- [Fix `indent_size`](https://github.com/editorconfig/editorconfig-vscode/issues/60) (thanks [`@jedmao`](https://github.com/jedmao))!
+
 ## 0.3.0
 - [Support `end_of_line`](https://github.com/editorconfig/editorconfig-vscode/issues/26) (thanks [`@jedmao`](https://github.com/jedmao))!
 
