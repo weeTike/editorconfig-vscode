@@ -1,3 +1,6 @@
+## 0.3.2
+- [Take `detectIndentation` into account](https://github.com/editorconfig/editorconfig-vscode/pull/70), fixes [`#51`](https://github.com/editorconfig/editorconfig-vscode/issues/51) and [`#52`](https://github.com/editorconfig/editorconfig-vscode/issues/52) (thanks [`@SamVerschueren`](https://github.com/SamVerschueren))!
+
 ## 0.3.1
 - [Fix `indent_size`](https://github.com/editorconfig/editorconfig-vscode/issues/60) (thanks [`@jedmao`](https://github.com/jedmao))!
 
