@@ -1,4 +1,4 @@
-# EditorConfig for [Visual Studio Code][]
+# [EditorConfig][] for [Visual Studio Code][]
 [![Travis Build Status][travis-img]][travis] [![Gitter][chat-img]][chat]
 
 [travis]: https://travis-ci.org/editorconfig/editorconfig-vscode
@@ -30,3 +30,4 @@ ext install EditorConfig
 * `charset`
 
 [Visual Studio Code]: https://code.visualstudio.com/
+[EditorConfig]: http://editorconfig.org/
