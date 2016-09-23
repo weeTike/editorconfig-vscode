@@ -119,11 +119,12 @@ class DocumentWatcher implements EditorConfigProvider {
 	}
 
 	private _onConfigChanged() {
-		this._defaults = {
-			tabSize: workspace.getConfiguration('editor')
-				.get<string | number>('tabSize'),
-			insertSpaces: workspace.getConfiguration('editor')
-				.get<string | boolean>('insertSpaces')
+		const workspaceConfig = workspace.getConfiguration('editor');
+		const detectIndentation = workspaceConfig.get<boolean>('detectIndentation');
+
+		this._defaults = (detectIndentation) ? {} : {
+			tabSize: workspaceConfig.get<string | number>('tabSize'),
+			insertSpaces: workspaceConfig.get<string | boolean>('insertSpaces')
 		};
 	}
 }
