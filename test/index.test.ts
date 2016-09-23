@@ -165,6 +165,26 @@ suite('EditorConfig extension', () => {
 		}, 25);
 	});
 
+	test('detect indentation', async (done) => {
+		const options = await getOptionsForFixture([
+			'detect-indentation',
+			'indent-size-2'
+		]);
+
+		assert.strictEqual(
+			options.tabSize,
+			undefined,
+			'editor has no tabSize defined'
+		);
+
+		assert.strictEqual(
+			options.insertSpaces,
+			undefined,
+			'editor has no insertSpaces defined'
+		);
+
+		done();
+	});
 });
 
 function withSetting(
