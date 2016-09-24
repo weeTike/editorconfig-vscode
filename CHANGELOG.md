@@ -1,3 +1,6 @@
+## 0.3.3
+- Compile project before publish.
+
 ## 0.3.2
 - [Take `detectIndentation` into account](https://github.com/editorconfig/editorconfig-vscode/pull/70), fixes [`#51`](https://github.com/editorconfig/editorconfig-vscode/issues/51) and [`#52`](https://github.com/editorconfig/editorconfig-vscode/issues/52) (thanks [`@SamVerschueren`](https://github.com/SamVerschueren))!
 
