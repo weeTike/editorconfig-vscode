@@ -4,21 +4,21 @@ import * as editorconfig from 'editorconfig';
 import {
 	workspace,
 	window,
-	TextEditor,
 	TextDocument,
 	TextLine,
 	Position,
-	Range
+	Range,
+	TextEdit
 } from 'vscode';
 
 /**
- * Transform the textdocument by trimming the trailing whitespace.
+ * Returns an array of `TextEdit` objects that will trim the
+ * trailing whitespace of each line.
  */
 export function transform(
 	editorconfig: editorconfig.knownProps,
-	editor: TextEditor,
 	textDocument: TextDocument
-) {
+): TextEdit[] {
 	const editorTrimsWhitespace = workspace
 		.getConfiguration('files')
 		.get('trimTrailingWhitespace', false);
@@ -30,45 +30,47 @@ export function transform(
 				'overriding the EditorConfig setting for this file.'
 			].join(' '));
 		}
-		return Promise.resolve([true]);
+		return [];
 	}
 
 	if (!editorconfig.trim_trailing_whitespace) {
-		return Promise.resolve([true]);
+		return [];
 	}
 
-	const trimmingOperations: Thenable<boolean>[] = [];
+	const trimmingOperations: TextEdit[] = [];
 
 	for (let i = 0; i < textDocument.lineCount; i++) {
-		trimmingOperations.push(
-			trimLineTrailingWhitespace(textDocument.lineAt(i))
-		);
-	}
+		const edit = trimLineTrailingWhitespace(textDocument.lineAt(i));
 
-	return Promise.all<boolean>(trimmingOperations);
-
-	function trimLineTrailingWhitespace(line: TextLine): Thenable<boolean> {
-		const trimmedLine = trimTrailingWhitespace(line.text);
-		if (trimmedLine === line.text) {
-			return Promise.resolve(true);
+		if (edit) {
+			trimmingOperations.push(edit);
 		}
-
-		return editor.edit(edit => {
-			const whitespaceBegin = new Position(
-				line.lineNumber,
-				trimmedLine.length
-			);
-			const whitespaceEnd = new Position(
-				line.lineNumber,
-				line.text.length
-			);
-			const whitespace = new Range(
-				whitespaceBegin,
-				whitespaceEnd
-			);
-			edit.delete(whitespace);
-		});
 	}
+
+	return trimmingOperations;
+}
+
+function trimLineTrailingWhitespace(line: TextLine) {
+	const trimmedLine = trimTrailingWhitespace(line.text);
+
+	if (trimmedLine === line.text) {
+		return;
+	}
+
+	const whitespaceBegin = new Position(
+		line.lineNumber,
+		trimmedLine.length
+	);
+	const whitespaceEnd = new Position(
+		line.lineNumber,
+		line.text.length
+	);
+	const whitespace = new Range(
+		whitespaceBegin,
+		whitespaceEnd
+	);
+
+	return TextEdit.delete(whitespace);
 }
 
 function trimTrailingWhitespace(input: string) {

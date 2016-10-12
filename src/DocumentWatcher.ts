@@ -6,10 +6,10 @@ import {
 	window,
 	workspace,
 	Disposable,
-	EndOfLine,
 	TextDocument,
 	TextEditor,
-	TextEditorOptions
+	TextEditorOptions,
+	TextEdit
 } from 'vscode';
 import * as Utils from './Utils';
 import {
@@ -51,14 +51,22 @@ class DocumentWatcher implements EditorConfigProvider {
 			if (path.basename(savedDocument.fileName) === '.editorconfig') {
 				// Saved an .editorconfig file => rebuild map entirely and then
 				// apply the changes to the .editorconfig file itself
-				this._rebuildConfigMap().then(applyOnSaveTransformations.bind(
-					undefined,
-					savedDocument,
-					this
-				));
+				this._rebuildConfigMap();
+				// TODO The transformations should be applied to the `.editorconfig` file as well after the config
+				// has been rebuilt
+				// this._rebuildConfigMap().then(applyOnSaveTransformations.bind(
+				// 	undefined,
+				// 	savedDocument,
+				// 	this
+				// ));
 				return;
 			}
-			applyOnSaveTransformations(savedDocument, this);
+		}));
+
+		subscriptions.push(workspace.onWillSaveTextDocument(e => {
+			const edits = calculatePreSaveTransformations(e.document, this);
+
+			e.waitUntil(Promise.resolve(edits));
 		}));
 
 		// dispose event subscriptons upon disposal
@@ -129,10 +137,10 @@ class DocumentWatcher implements EditorConfigProvider {
 	}
 }
 
-function applyOnSaveTransformations(
+function calculatePreSaveTransformations(
 	textDocument: TextDocument,
 	provider: EditorConfigProvider
-) {
+): TextEdit[] {
 	const editorconfig = provider.getSettingsForDocument(textDocument);
 
 	if (!editorconfig) {
@@ -140,15 +148,10 @@ function applyOnSaveTransformations(
 		return;
 	}
 
-	const editor = Utils.findEditor(textDocument);
-
-	if (!editor) {
-		return;
-	}
-
-	trimTrailingWhitespaceTransform(editorconfig, editor, textDocument)
-		.then(() => insertFinalNewlineTransform(editorconfig, editor, textDocument))
-		.then(() => textDocument.save());
+	return [
+		...insertFinalNewlineTransform(editorconfig, textDocument),
+		...trimTrailingWhitespaceTransform(editorconfig, textDocument)
+	];
 }
 
 function applyEditorConfigToTextEditor(

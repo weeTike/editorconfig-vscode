@@ -2,9 +2,9 @@
 
 import * as editorconfig from 'editorconfig';
 import {
-	TextEditor,
 	TextDocument,
-	Position
+	Position,
+	TextEdit
 } from 'vscode';
 
 const lineEndings = {
@@ -13,30 +13,27 @@ const lineEndings = {
 };
 
 /**
- * Transform the textdocument by inserting a final newline.
+ * Returns an array of `TextEdit` objects that will insert
+ * a final newline.
  */
 export function transform(
 	editorconfig: editorconfig.knownProps,
-	editor: TextEditor,
 	textDocument: TextDocument
-): Thenable<boolean|void> {
+): TextEdit[] {
 	const lineCount = textDocument.lineCount;
-
-	if (!editorconfig.insert_final_newline || lineCount === 0) {
-		return Promise.resolve();
-	}
-
 	const lastLine = textDocument.lineAt(lineCount - 1);
-	const lastLineLength = lastLine.text.length;
 
-	if (lastLineLength === 0) {
-		return Promise.resolve();
+	if (!editorconfig.insert_final_newline
+		|| lineCount === 0
+		|| lastLine.isEmptyOrWhitespace) {
+		return [];
 	}
 
-	return editor.edit(edit => {
-		const pos = new Position(lastLine.lineNumber, lastLineLength);
-		return edit.insert(pos, newline(editorconfig));
-	});
+	const position = new Position(lastLine.lineNumber, lastLine.text.length);
+
+	return [
+		TextEdit.insert(position, newline(editorconfig))
+	];
 }
 
 function newline(editorconfig: editorconfig.knownProps) {
