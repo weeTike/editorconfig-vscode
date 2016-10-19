@@ -1,3 +1,6 @@
+## 0.3.4
+- [Use `onWillSaveTextDocument`]https://github.com/editorconfig/editorconfig-vscode/pull/80, fixes [`#76`](https://github.com/editorconfig/editorconfig-vscode/issues/76) and [`#79`](https://github.com/editorconfig/editorconfig-vscode/issues/79) (thanks [`@SamVerschueren`](https://github.com/SamVerschueren))!
+
 ## 0.3.3
 - Compile project before publish.
 
