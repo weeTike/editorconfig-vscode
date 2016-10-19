@@ -33,9 +33,9 @@ export function generateEditorConfig() {
 		if (err) {
 			if (err.code === 'ENOENT') {
 				writeFile();
-				return;
+			} else {
+				window.showErrorMessage(err.message);
 			}
-			window.showErrorMessage(err.message);
 			return;
 		}
 

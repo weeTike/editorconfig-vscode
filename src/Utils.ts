@@ -1,7 +1,7 @@
 'use strict';
 
+import { get } from 'lodash';
 import * as editorconfig from 'editorconfig';
-const get = require('lodash.get');
 import {
 	window,
 	TextDocument,

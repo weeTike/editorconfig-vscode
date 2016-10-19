@@ -1,5 +1,6 @@
 'use strict';
 
+import { get } from 'lodash';
 import * as editorconfig from 'editorconfig';
 import {
 	TextDocument,
@@ -9,7 +10,8 @@ import {
 
 const lineEndings = {
 	cr: '\r',
-	crlf: '\r\n'
+	crlf: '\r\n',
+	lf: '\n'
 };
 
 /**
@@ -37,9 +39,7 @@ export function transform(
 }
 
 function newline(editorconfig: editorconfig.knownProps) {
-	if (!editorconfig.end_of_line) {
-		return '\n';
-	}
-
-	return lineEndings[editorconfig.end_of_line.toLowerCase()] || '\n';
+	return lineEndings[
+		get(editorconfig, 'end_of_line', 'lf').toLowerCase()
+	];
 }

@@ -177,7 +177,7 @@ function applyEditorConfigToTextEditor(
 	);
 
 	/* tslint:disable:no-any */
-	textEditor.options = <any> newOptions;
+	textEditor.options = newOptions as any;
 	/* tslint:enable */
 
 	return endOfLineTransform(editorconfig, textEditor, doc);
