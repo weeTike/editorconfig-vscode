@@ -2,8 +2,12 @@ sudo: false
 
 language: node_js
 
+os:
+  # - osx
+  - linux
+
 node_js:
-  - '5.7'
+  - '6.9.0'
 
 before_install:
   - if [ $TRAVIS_OS_NAME == "linux" ]; then
@@ -11,6 +15,10 @@ before_install:
       sh -e /etc/init.d/xvfb start;
       sleep 3;
     fi
+
+install:
+  - npm install
+  - npm run vscode:prepublish
 
 script:
   - npm test --silent
