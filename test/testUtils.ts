@@ -1,5 +1,3 @@
-'use strict';
-
 import * as assert from 'assert';
 import * as path from 'path';
 import {
@@ -14,15 +12,14 @@ export async function getOptionsForFixture(file: string[]) {
 }
 
 export function getFixturePath(file: string[]) {
-	return path.join.apply(
-		this,
-		[
+	return path.join(
+		...([
 			__dirname,
 			'..',
 			'..',
 			'test',
 			'fixtures'
-		].concat(file)
+		].concat(file))
 	);
 }
 

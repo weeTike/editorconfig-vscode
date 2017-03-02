@@ -1,5 +1,3 @@
-'use strict';
-
 import * as editorconfig from 'editorconfig';
 import * as path from 'path';
 import {
@@ -52,8 +50,8 @@ class DocumentWatcher implements EditorConfigProvider {
 				// Saved an .editorconfig file => rebuild map entirely and then
 				// apply the changes to the .editorconfig file itself
 				this._rebuildConfigMap();
-				// TODO The transformations should be applied to the `.editorconfig` file as well after the config
-				// has been rebuilt
+				// TODO The transformations should be applied to the .editorconfig`
+				// file as well after the config has been rebuilt
 				// this._rebuildConfigMap().then(applyOnSaveTransformations.bind(
 				// 	undefined,
 				// 	savedDocument,
@@ -140,7 +138,7 @@ class DocumentWatcher implements EditorConfigProvider {
 function calculatePreSaveTransformations(
 	textDocument: TextDocument,
 	provider: EditorConfigProvider
-): TextEdit[] {
+): TextEdit[] | void {
 	const editorconfig = provider.getSettingsForDocument(textDocument);
 
 	if (!editorconfig) {
@@ -180,7 +178,7 @@ function applyEditorConfigToTextEditor(
 	textEditor.options = newOptions as any;
 	/* tslint:enable */
 
-	return endOfLineTransform(editorconfig, textEditor, doc);
+	return endOfLineTransform(editorconfig, textEditor);
 }
 
 export default DocumentWatcher;
