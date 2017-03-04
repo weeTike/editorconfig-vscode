@@ -1,3 +1,7 @@
+## 0.5.0
+- Added auto-complete improvements ([#103](https://github.com/editorconfig/editorconfig-vscode/pull/103)).
+- Lighten distribution package ([#104](https://github.com/editorconfig/editorconfig-vscode/pull/104)).
+
 ## 0.4.0
 - Feature: Support `.editorconfig` auto-complete ([#99](https://github.com/editorconfig/editorconfig-vscode/pull/99)).
 
