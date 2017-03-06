@@ -1,3 +1,7 @@
+## 0.6.0
+- Automatically display property values when editing `.editorconfig` ([#109](https://github.com/editorconfig/editorconfig-vscode/pull/109)).
+- Add recommended extensions ([#110](https://github.com/editorconfig/editorconfig-vscode/pull/110)).
+
 ## 0.5.0
 - Added auto-complete improvements ([#103](https://github.com/editorconfig/editorconfig-vscode/pull/103)).
 - Lighten distribution package ([#104](https://github.com/editorconfig/editorconfig-vscode/pull/104)).
