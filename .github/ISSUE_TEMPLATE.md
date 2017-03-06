@@ -14,3 +14,11 @@ If the extension is not picking up the expected configuration for a file:
 ### Actual behavior
 
 ### Steps to reproduce the behavior
+
+```ini
+root = true
+
+[*]
+indent_style = space
+indent_size = 2
+```
