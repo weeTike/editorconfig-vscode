@@ -1,3 +1,6 @@
+## 0.6.1
+- Set EOL just before file save.
+
 ## 0.6.0
 - Automatically display property values when editing `.editorconfig` ([#109](https://github.com/editorconfig/editorconfig-vscode/pull/109)).
 - Add recommended extensions ([#110](https://github.com/editorconfig/editorconfig-vscode/pull/110)).

@@ -1,26 +1,25 @@
 import * as editorconfig from 'editorconfig';
-import {
-	EndOfLine,
-	TextEditor
-} from 'vscode';
+import { EndOfLine, TextDocument } from 'vscode';
+
+import { findEditor } from '../Utils';
 
 /**
  * Transform the textdocument by setting the end of line sequence
  */
-export function transform(
+export async function transform(
 	editorconfig: editorconfig.knownProps,
-	editor: TextEditor
-): Thenable<boolean|void> {
+	textDocument: TextDocument
+) {
 	const eol = {
 		lf: EndOfLine.LF,
 		crlf: EndOfLine.CRLF
 	}[(editorconfig.end_of_line || '').toLowerCase()];
 
 	if (!eol) {
-		return Promise.resolve();
+		return Promise.resolve(false);
 	}
 
-	return editor.edit(edit => {
+	return findEditor(textDocument).edit(edit => {
 		edit.setEndOfLine(eol);
 	});
 }
