@@ -1,5 +1,5 @@
-import * as os from 'os';
 import * as assert from 'assert';
+import * as os from 'os';
 import {
 	Position,
 	window,
@@ -8,8 +8,7 @@ import {
 } from 'vscode';
 import {
 	getFixturePath,
-	getOptionsForFixture,
-	delay
+	getOptionsForFixture
 } from './testUtils';
 
 import * as utils from 'vscode-test-utils';
@@ -52,7 +51,10 @@ suite('EditorConfig extension', () => {
 
 	test('subfolder settings', async () => {
 		for (const n of [2, 3, 4, 'x']) {
-			const options = await getOptionsForFixture(['folder', `tab-width-${n}`]);
+			const options = await getOptionsForFixture([
+				'folder',
+				`tab-width-${n}`
+			]);
 			const expectedTabSize = (n === 'x') ? 8 : n;
 			assert.strictEqual(
 				options.insertSpaces,
@@ -62,7 +64,10 @@ suite('EditorConfig extension', () => {
 			assert.strictEqual(
 				options.tabSize,
 				expectedTabSize,
-				`editor has a tabSize of ${options.tabSize} instead of ${expectedTabSize}`
+				[
+					`editor has a tabSize of ${options.tabSize}`,
+					`instead of ${expectedTabSize}`
+				].join(' ')
 			);
 		}
 	});
@@ -105,51 +110,51 @@ suite('EditorConfig extension', () => {
 	});
 
 	test('end_of_line = lf', async () => {
-		const doc = await withSetting(
+		const savedText = await withSetting(
 			'end_of_line',
 			'lf',
 			{
-				contents: 'foo\r\n'
+				contents: 'bar\r\n'
 			}
-		).doc;
-		assert.strictEqual(doc.getText(), 'foo\n',
-			'editor fails to convert CRLF line endings into LF on open');
+		).saveText('foo\r\n');
+		assert.strictEqual(savedText, 'foo\nbar\n',
+			'editor fails to convert CRLF line endings into LF on save');
 	});
 
 	test('end_of_line = crlf', async () => {
-		const doc = await withSetting(
+		const savedText = await withSetting(
 			'end_of_line',
 			'crlf',
 			{
-				contents: 'foo\n'
+				contents: 'bar\n'
 			}
-		).doc;
-		assert.strictEqual(doc.getText(), 'foo\r\n',
-			'editor fails to convert LF line endings into CRLF on open');
+		).saveText('foo\n');
+		assert.strictEqual(savedText, 'foo\r\nbar\r\n',
+			'editor fails to convert LF line endings into CRLF on save');
 	});
 
-	test('end_of_line = preserve', async () => {
-		const doc = await withSetting(
+	test('end_of_line = unset', async () => {
+		const savedText = await withSetting(
 			'end_of_line',
-			'preserve',
+			'unset',
 			{
-				contents: 'foo\r\n'
+				contents: 'bar\n'
 			}
-		).doc;
-		assert.strictEqual(doc.getText(), 'foo\r\n',
-			'editor fails to preserve CRLF line endings on open');
+		).saveText('foo\n');
+		assert.strictEqual(savedText, 'foo\nbar\n',
+			'editor fails to preserve CRLF line endings on save');
 	});
 
-	test('end_of_line = undefined', async () => {
-		const doc = await withSetting(
+	test('end_of_line is undefined', async () => {
+		const savedText = await withSetting(
 			'end_of_line',
 			'undefined',
 			{
-				contents: 'foo\r\n'
+				contents: 'bar\n'
 			}
-		).doc;
-		assert.strictEqual(doc.getText(), 'foo\r\n',
-			'editor fails to preserve CRLF line endings on open');
+		).saveText('foo\n');
+		assert.strictEqual(savedText, 'foo\nbar\n',
+			'editor fails to preserve CRLF line endings on save');
 	});
 
 	test('detect indentation', async () => {
@@ -174,41 +179,35 @@ suite('EditorConfig extension', () => {
 function withSetting(
 	rule: string,
 	value: string,
-	options?: {
-		contents?: string;
-		saves?: number;
-	}
+	options: {
+		contents?: string
+	} = {}
 ) {
-	options = options || {};
 	return {
-		doc: createDoc(options.contents),
-		saveText: async (text: string) => {
-			return await new Promise<string>(async (resolve) => {
-				const doc = await createDoc();
-				const edit = new WorkspaceEdit();
-				edit.insert(doc.uri, new Position(0, 0), text);
-				assert.strictEqual(
-					await workspace.applyEdit(edit),
-					true,
-					'editor fails to apply edit'
-				);
-				workspace.onDidSaveTextDocument(savedDoc => {
-					resolve(savedDoc.getText());
-				});
-				workspace.onDidChangeTextDocument(doc.save);
+		saveText: (text: string) => new Promise(async resolve => {
+			const doc = await createDoc(options.contents);
+			workspace.onDidSaveTextDocument(savedDoc => {
+				resolve(savedDoc.getText());
 			});
-		}
+			workspace.onDidChangeTextDocument(doc.save);
+			const edit = new WorkspaceEdit();
+			edit.insert(doc.uri, new Position(0, 0), text);
+			assert.strictEqual(
+				await workspace.applyEdit(edit),
+				true,
+				'editor fails to apply edit'
+			);
+		})
 	};
 
-	async function createDoc(contents?: string) {
-		const filename = await utils.createFile(contents || '', getFixturePath([
+	async function createDoc(contents: string = '') {
+		const filename = await utils.createFile(contents, getFixturePath([
 			rule,
 			value,
 			'test'
 		]));
 		const doc = await workspace.openTextDocument(filename);
 		await window.showTextDocument(doc);
-		await delay(50);
 		return doc;
 	}
 }
