@@ -1,3 +1,6 @@
+## 0.6.2
+- Save/restore selections (cursors) during file save.
+
 ## 0.6.1
 - Set EOL just before file save.
 
