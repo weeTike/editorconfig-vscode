@@ -135,7 +135,17 @@ class DocumentWatcher implements EditorConfigProvider {
 	}
 
 	private onWillSaveTextDocument(e: TextDocumentWillSaveEvent) {
-		e.waitUntil(this.calculatePreSaveTransformations(e.document));
+		let selections: Selection[];
+		if (window.activeTextEditor.document === e.document) {
+			selections = window.activeTextEditor.selections;
+		}
+		const transformations = this.calculatePreSaveTransformations(e.document);
+		e.waitUntil(transformations);
+		if (selections) {
+			transformations.then(() => {
+				window.activeTextEditor.selections = selections;
+			});
+		}
 	}
 
 	private async calculatePreSaveTransformations(
