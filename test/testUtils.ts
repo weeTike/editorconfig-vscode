@@ -23,12 +23,10 @@ export function getFixturePath(file: string[]) {
 	);
 }
 
-/**
- * Waits for a specified amount of time, specified in milliseconds.
- * @param wait The number of milliseconds to wait.
- */
-export function wait(ms?: number) {
-	return new Promise(resolve => setTimeout(resolve, ms));
+export function delay(ms: number) {
+	return new Promise<void>(function (resolve) {
+		setTimeout(resolve, ms);
+	});
 }
 
 async function getTextEditorOptions() {
@@ -40,7 +38,7 @@ async function getTextEditorOptions() {
 			assert.ok(e.options);
 			resolve(e.options);
 		});
-		await wait(100);
+		await delay(100);
 		if (resolved) {
 			return;
 		}
