@@ -4,9 +4,7 @@ import {
 	window,
 	workspace,
 	Disposable,
-	Selection,
 	TextDocument,
-	TextDocumentWillSaveEvent,
 	TextEditor,
 	TextEditorOptions,
 	TextEdit
@@ -27,54 +25,77 @@ import {
  */
 class DocumentWatcher implements EditorConfigProvider {
 
-	private documentToConfigMap: { [uri: string]: editorconfig.knownProps };
-	private disposable: Disposable;
-	private defaults: TextEditorOptions;
+	private _documentToConfigMap: { [uri: string]: editorconfig.knownProps };
+	private _disposable: Disposable;
+	private _defaults: TextEditorOptions;
 
 	constructor() {
 		const subscriptions: Disposable[] = [];
 
-		window.onDidChangeActiveTextEditor(
-			this.onDidChangeActiveTextEditor, this, subscriptions
-		);
+		// Listen for changes in the active text editor
+		subscriptions.push(window.onDidChangeActiveTextEditor(textEditor => {
+			if (textEditor && textEditor.document) {
+				this._onDidOpenDocument(textEditor.document);
+			}
+		}));
 
-		workspace.onDidChangeConfiguration(
-			this.onDidChangeConfiguration, this, subscriptions
-		);
+		// Listen for changes in the configuration
+		subscriptions.push(workspace.onDidChangeConfiguration(
+			this._onConfigChanged.bind(this)
+		));
 
-		workspace.onWillSaveTextDocument(
-			this.onWillSaveTextDocument, this, subscriptions
-		);
+		// Listen for saves to ".editorconfig" files and rebuild the map
+		subscriptions.push(workspace.onDidSaveTextDocument(
+			async savedDocument => {
+				if (path.basename(savedDocument.fileName) === '.editorconfig') {
+					await this._rebuildConfigMap();
+				}
+			}
+		));
 
-		workspace.onDidSaveTextDocument(
-			this.onDidSaveTextDocument, this, subscriptions
-		);
+		subscriptions.push(workspace.onWillSaveTextDocument(e => {
+			e.waitUntil(calculatePreSaveTransformations.call(this, e.document));
+		}));
 
-		this.disposable = Disposable.from(...subscriptions);
+		// dispose event subscriptons upon disposal
+		this._disposable = Disposable.from.apply(this, subscriptions);
 
-		this.rebuildConfigMap();
+		// Build the map (cover the case that documents were opened before
+		// my activation)
+		this._rebuildConfigMap();
 
-		this.onDidChangeConfiguration();
+		// Load the initial workspace configuration
+		this._onConfigChanged();
 	}
 
 	public dispose() {
-		this.disposable.dispose();
+		this._disposable.dispose();
 	}
 
-	private onDidChangeActiveTextEditor(editor: TextEditor) {
-		if (editor && editor.document) {
-			this.onDidOpenDocument(editor.document);
-		}
+	public getSettingsForDocument(document: TextDocument) {
+		return this._documentToConfigMap[document.fileName];
 	}
 
-	private onDidOpenDocument(doc: TextDocument) {
-		if (doc.isUntitled) {
+	public getDefaultSettings() {
+		return this._defaults;
+	}
+
+	private _rebuildConfigMap() {
+		this._documentToConfigMap = {};
+		return Promise.all(workspace.textDocuments.map(
+			document => this._onDidOpenDocument(document)
+		));
+	}
+
+	private _onDidOpenDocument(document: TextDocument) {
+		if (document.isUntitled) {
+			// Does not have a fs path
 			return Promise.resolve();
 		}
-		const path = doc.fileName;
+		const path = document.fileName;
 
-		if (this.documentToConfigMap[path]) {
-			this.applyEditorConfigToTextEditor();
+		if (this._documentToConfigMap[path]) {
+			applyEditorConfigToTextEditor.call(this, window.activeTextEditor);
 			return Promise.resolve();
 		}
 
@@ -84,107 +105,67 @@ class DocumentWatcher implements EditorConfigProvider {
 					config.indent_size = config.tab_width;
 				}
 
-				this.documentToConfigMap[path] = config;
+				this._documentToConfigMap[path] = config;
 
-				this.applyEditorConfigToTextEditor();
+				applyEditorConfigToTextEditor.call(this, window.activeTextEditor);
 			});
 	}
 
-	private applyEditorConfigToTextEditor() {
-		const editor = window.activeTextEditor;
-		if (!editor) {
-			// No more open editors
-			return;
-		}
-
-		const doc = editor.document;
-		const editorconfig = this.getSettingsForDocument(doc);
-
-		if (!editorconfig) {
-			// no configuration found for this file
-			return;
-		}
-
-		const newOptions = Utils.fromEditorConfig(
-			editorconfig,
-			this.getDefaultSettings()
-		);
-
-		// tslint:disable-next-line:no-any
-		editor.options = newOptions as any;
-	}
-
-	public getSettingsForDocument(document: TextDocument) {
-		return this.documentToConfigMap[document.fileName];
-	}
-
-	public getDefaultSettings() {
-		return this.defaults;
-	}
-
-	private onDidChangeConfiguration() {
+	private _onConfigChanged() {
 		const workspaceConfig = workspace.getConfiguration('editor');
-		const detectIndentation = workspaceConfig.get<boolean>(
-			'detectIndentation'
-		);
+		const detectIndentation = workspaceConfig.get<boolean>('detectIndentation');
 
-		this.defaults = (detectIndentation) ? {} : {
+		this._defaults = (detectIndentation) ? {} : {
 			tabSize: workspaceConfig.get<string | number>('tabSize'),
 			insertSpaces: workspaceConfig.get<string | boolean>('insertSpaces')
 		};
 	}
+}
 
-	private onWillSaveTextDocument(e: TextDocumentWillSaveEvent) {
-		let selections: Selection[];
-		if (window.activeTextEditor.document === e.document) {
-			selections = window.activeTextEditor.selections;
-		}
-		const transformations = this.calculatePreSaveTransformations(e.document);
-		e.waitUntil(transformations);
-		if (selections) {
-			transformations.then(() => {
-				window.activeTextEditor.selections = selections;
-			});
-		}
+async function calculatePreSaveTransformations(
+	this: EditorConfigProvider,
+	textDocument: TextDocument
+): Promise<TextEdit[] | void> {
+	const editorconfig = this.getSettingsForDocument(textDocument);
+
+	if (!editorconfig) {
+		// no configuration found for this file
+		return Promise.resolve();
 	}
 
-	private async calculatePreSaveTransformations(
-		textDocument: TextDocument
-	): Promise<TextEdit[] | void> {
-		const editorconfig = this.getSettingsForDocument(textDocument);
+	await endOfLineTransform(editorconfig, textDocument);
 
-		if (!editorconfig) {
-			// no configuration found for this file
-			return Promise.resolve();
-		}
+	return [
+		...insertFinalNewlineTransform(editorconfig, textDocument),
+		...trimTrailingWhitespaceTransform(editorconfig, textDocument)
+	];
+}
 
-		await endOfLineTransform(editorconfig, textDocument);
-
-		return [
-			...insertFinalNewlineTransform(editorconfig, textDocument),
-			...trimTrailingWhitespaceTransform(editorconfig, textDocument)
-		];
+function applyEditorConfigToTextEditor(
+	this: EditorConfigProvider,
+	textEditor: TextEditor
+) {
+	if (!textEditor) {
+		// No more open editors
+		return;
 	}
 
-	/**
-	 * Listen for saves to ".editorconfig" files and rebuild the map.
-	 */
-	private async onDidSaveTextDocument(doc: TextDocument) {
-		if (path.basename(doc.fileName) === '.editorconfig') {
-			await this.rebuildConfigMap();
-		}
+	const doc = textEditor.document;
+	const editorconfig = this.getSettingsForDocument(doc);
+
+	if (!editorconfig) {
+		// no configuration found for this file
+		return;
 	}
 
-	/**
-	 * Build the map (cover the case that documents were opened before
-	 * my activation)
-	 */
-	private rebuildConfigMap() {
-		this.documentToConfigMap = {};
-		return Promise.all(workspace.textDocuments.map(
-			document => this.onDidOpenDocument(document)
-		));
-	}
+	const newOptions = Utils.fromEditorConfig(
+		editorconfig,
+		this.getDefaultSettings()
+	);
+
+	/* tslint:disable:no-any */
+	textEditor.options = newOptions as any;
+	/* tslint:enable */
 }
 
 export default DocumentWatcher;
