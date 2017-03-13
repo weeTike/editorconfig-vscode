@@ -45,16 +45,26 @@ class DocumentWatcher implements EditorConfigProvider {
 		));
 
 		// Listen for saves to ".editorconfig" files and rebuild the map
-		subscriptions.push(workspace.onDidSaveTextDocument(
-			async savedDocument => {
-				if (path.basename(savedDocument.fileName) === '.editorconfig') {
-					await this._rebuildConfigMap();
-				}
+		subscriptions.push(workspace.onDidSaveTextDocument(savedDocument => {
+			if (path.basename(savedDocument.fileName) === '.editorconfig') {
+				// Saved an .editorconfig file => rebuild map entirely and then
+				// apply the changes to the .editorconfig file itself
+				this._rebuildConfigMap();
+				// TODO The transformations should be applied to the .editorconfig`
+				// file as well after the config has been rebuilt
+				// this._rebuildConfigMap().then(applyOnSaveTransformations.bind(
+				// 	undefined,
+				// 	savedDocument,
+				// 	this
+				// ));
+				return;
 			}
-		));
+		}));
 
 		subscriptions.push(workspace.onWillSaveTextDocument(e => {
-			e.waitUntil(calculatePreSaveTransformations.call(this, e.document));
+			const edits = calculatePreSaveTransformations(e.document, this);
+
+			e.waitUntil(Promise.resolve(edits));
 		}));
 
 		// dispose event subscriptons upon disposal
@@ -95,7 +105,7 @@ class DocumentWatcher implements EditorConfigProvider {
 		const path = document.fileName;
 
 		if (this._documentToConfigMap[path]) {
-			applyEditorConfigToTextEditor.call(this, window.activeTextEditor);
+			applyEditorConfigToTextEditor(window.activeTextEditor, this);
 			return Promise.resolve();
 		}
 
@@ -107,7 +117,10 @@ class DocumentWatcher implements EditorConfigProvider {
 
 				this._documentToConfigMap[path] = config;
 
-				applyEditorConfigToTextEditor.call(this, window.activeTextEditor);
+				return applyEditorConfigToTextEditor(
+					window.activeTextEditor,
+					this
+				);
 			});
 	}
 
@@ -122,18 +135,16 @@ class DocumentWatcher implements EditorConfigProvider {
 	}
 }
 
-async function calculatePreSaveTransformations(
-	this: EditorConfigProvider,
-	textDocument: TextDocument
-): Promise<TextEdit[] | void> {
-	const editorconfig = this.getSettingsForDocument(textDocument);
+function calculatePreSaveTransformations(
+	textDocument: TextDocument,
+	provider: EditorConfigProvider
+): TextEdit[] | void {
+	const editorconfig = provider.getSettingsForDocument(textDocument);
 
 	if (!editorconfig) {
 		// no configuration found for this file
-		return Promise.resolve();
+		return;
 	}
-
-	await endOfLineTransform(editorconfig, textDocument);
 
 	return [
 		...insertFinalNewlineTransform(editorconfig, textDocument),
@@ -142,30 +153,32 @@ async function calculatePreSaveTransformations(
 }
 
 function applyEditorConfigToTextEditor(
-	this: EditorConfigProvider,
-	textEditor: TextEditor
+	textEditor: TextEditor,
+	provider: EditorConfigProvider
 ) {
 	if (!textEditor) {
 		// No more open editors
-		return;
+		return Promise.resolve();
 	}
 
 	const doc = textEditor.document;
-	const editorconfig = this.getSettingsForDocument(doc);
+	const editorconfig = provider.getSettingsForDocument(doc);
 
 	if (!editorconfig) {
 		// no configuration found for this file
-		return;
+		return Promise.resolve();
 	}
 
 	const newOptions = Utils.fromEditorConfig(
 		editorconfig,
-		this.getDefaultSettings()
+		provider.getDefaultSettings()
 	);
 
 	/* tslint:disable:no-any */
 	textEditor.options = newOptions as any;
 	/* tslint:enable */
+
+	return endOfLineTransform(editorconfig, textEditor);
 }
 
 export default DocumentWatcher;
