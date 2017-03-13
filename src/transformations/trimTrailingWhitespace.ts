@@ -15,7 +15,7 @@ import {
  */
 export function transform(
 	editorconfig: editorconfig.knownProps,
-	textDocument: TextDocument
+	doc: TextDocument
 ): TextEdit[] {
 	const editorTrimsWhitespace = workspace
 		.getConfiguration('files')
@@ -37,8 +37,8 @@ export function transform(
 
 	const trimmingOperations: TextEdit[] = [];
 
-	for (let i = 0; i < textDocument.lineCount; i++) {
-		const edit = trimLineTrailingWhitespace(textDocument.lineAt(i));
+	for (let i = 0; i < doc.lineCount; i++) {
+		const edit = trimLineTrailingWhitespace(doc.lineAt(i));
 
 		if (edit) {
 			trimmingOperations.push(edit);

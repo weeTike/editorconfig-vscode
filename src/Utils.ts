@@ -62,9 +62,9 @@ export function resolveTabSize(tabSize: number|string) {
 /**
  * Retrieve the current active text editor.
  */
-export function findEditor(textDocument: TextDocument): TextEditor {
+export function findEditor(doc: TextDocument): TextEditor {
 	for (const editor of window.visibleTextEditors) {
-		if (editor.document === textDocument) {
+		if (editor.document === doc) {
 			return editor;
 		}
 	}
