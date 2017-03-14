@@ -49,7 +49,7 @@ class DocumentWatcher implements EditorConfigProvider {
 			if (path.basename(savedDocument.fileName) === '.editorconfig') {
 				// Saved an .editorconfig file => rebuild map entirely and then
 				// apply the changes to the .editorconfig file itself
-				this._rebuildConfigMap();
+				this.rebuildConfigMap();
 				// TODO The transformations should be applied to the .editorconfig`
 				// file as well after the config has been rebuilt
 				// this._rebuildConfigMap().then(applyOnSaveTransformations.bind(
@@ -62,7 +62,7 @@ class DocumentWatcher implements EditorConfigProvider {
 		}));
 
 		subscriptions.push(workspace.onWillSaveTextDocument(e => {
-			const edits = calculatePreSaveTransformations(e.document, this);
+			const edits = this.calculatePreSaveTransformations(e.document);
 
 			e.waitUntil(Promise.resolve(edits));
 		}));
@@ -72,7 +72,7 @@ class DocumentWatcher implements EditorConfigProvider {
 
 		// Build the map (cover the case that documents were opened before
 		// my activation)
-		this._rebuildConfigMap();
+		this.rebuildConfigMap();
 
 		// Load the initial workspace configuration
 		this.onConfigChanged();
@@ -90,7 +90,7 @@ class DocumentWatcher implements EditorConfigProvider {
 		return this.defaults;
 	}
 
-	private _rebuildConfigMap() {
+	private rebuildConfigMap() {
 		this.docToConfigMap = {};
 		return Promise.all(workspace.textDocuments.map(
 			doc => this.onDidOpenDocument(doc)
@@ -105,7 +105,7 @@ class DocumentWatcher implements EditorConfigProvider {
 		const path = doc.fileName;
 
 		if (this.docToConfigMap[path]) {
-			applyEditorConfigToTextEditor(window.activeTextEditor, this);
+			this.applyEditorConfigToTextEditor(window.activeTextEditor);
 			return Promise.resolve();
 		}
 
@@ -117,11 +117,36 @@ class DocumentWatcher implements EditorConfigProvider {
 
 				this.docToConfigMap[path] = config;
 
-				return applyEditorConfigToTextEditor(
-					window.activeTextEditor,
-					this
-				);
+				return this.applyEditorConfigToTextEditor(window.activeTextEditor);
 			});
+	}
+
+	private applyEditorConfigToTextEditor(
+		editor: TextEditor
+	) {
+		if (!editor) {
+			// No more open editors
+			return Promise.resolve();
+		}
+
+		const doc = editor.document;
+		const editorconfig = this.getSettingsForDocument(doc);
+
+		if (!editorconfig) {
+			// no configuration found for this file
+			return Promise.resolve();
+		}
+
+		const newOptions = fromEditorConfig(
+			editorconfig,
+			this.getDefaultSettings()
+		);
+
+		/* tslint:disable:no-any */
+		editor.options = newOptions as any;
+		/* tslint:enable */
+
+		return endOfLineTransform(editorconfig, editor);
 	}
 
 	private onConfigChanged() {
@@ -133,52 +158,22 @@ class DocumentWatcher implements EditorConfigProvider {
 			insertSpaces: workspaceConfig.get<string | boolean>('insertSpaces')
 		};
 	}
-}
 
-function calculatePreSaveTransformations(
-	doc: TextDocument,
-	provider: EditorConfigProvider
-): TextEdit[] | void {
-	const editorconfig = provider.getSettingsForDocument(doc);
+	private calculatePreSaveTransformations(
+		doc: TextDocument
+	): TextEdit[] | void {
+		const editorconfig = this.getSettingsForDocument(doc);
 
-	if (!editorconfig) {
-		// no configuration found for this file
-		return;
+		if (!editorconfig) {
+			// no configuration found for this file
+			return;
+		}
+
+		return [
+			...insertFinalNewlineTransform(editorconfig, doc),
+			...trimTrailingWhitespaceTransform(editorconfig, doc)
+		];
 	}
-
-	return [
-		...insertFinalNewlineTransform(editorconfig, doc),
-		...trimTrailingWhitespaceTransform(editorconfig, doc)
-	];
-}
-
-function applyEditorConfigToTextEditor(
-	editor: TextEditor,
-	provider: EditorConfigProvider
-) {
-	if (!editor) {
-		// No more open editors
-		return Promise.resolve();
-	}
-
-	const doc = editor.document;
-	const editorconfig = provider.getSettingsForDocument(doc);
-
-	if (!editorconfig) {
-		// no configuration found for this file
-		return Promise.resolve();
-	}
-
-	const newOptions = fromEditorConfig(
-		editorconfig,
-		provider.getDefaultSettings()
-	);
-
-	/* tslint:disable:no-any */
-	editor.options = newOptions as any;
-	/* tslint:enable */
-
-	return endOfLineTransform(editorconfig, editor);
 }
 
 export default DocumentWatcher;
