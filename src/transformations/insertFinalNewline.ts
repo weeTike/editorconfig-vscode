@@ -18,10 +18,10 @@ const lineEndings = {
  */
 export function transform(
 	editorconfig: editorconfig.knownProps,
-	textDocument: TextDocument
+	doc: TextDocument
 ): TextEdit[] {
-	const lineCount = textDocument.lineCount;
-	const lastLine = textDocument.lineAt(lineCount - 1);
+	const lineCount = doc.lineCount;
+	const lastLine = doc.lineAt(lineCount - 1);
 
 	if (!editorconfig.insert_final_newline
 		|| lineCount === 0
