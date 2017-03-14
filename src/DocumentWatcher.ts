@@ -19,10 +19,6 @@ import {
 	EditorConfigProvider
 } from './interfaces/editorConfigProvider';
 
-/**
- * Listens to vscode document open and maintains a map
- * (Document => editor config settings)
- */
 class DocumentWatcher implements EditorConfigProvider {
 
 	private docToConfigMap: { [fileName: string]: editorconfig.knownProps };
@@ -36,49 +32,29 @@ class DocumentWatcher implements EditorConfigProvider {
 
 		const subscriptions: Disposable[] = [];
 
-		// Listen for changes in the active text editor
 		subscriptions.push(window.onDidChangeActiveTextEditor(editor => {
 			if (editor && editor.document) {
 				this.onDidOpenDocument(editor.document);
 			}
 		}));
 
-		// Listen for changes in the configuration
 		subscriptions.push(workspace.onDidChangeConfiguration(
 			this.onConfigChanged.bind(this)
 		));
 
-		// Listen for saves to ".editorconfig" files and rebuild the map
-		subscriptions.push(workspace.onDidSaveTextDocument(savedDocument => {
-			if (path.basename(savedDocument.fileName) === '.editorconfig') {
-				// Saved an .editorconfig file => rebuild map entirely and then
-				// apply the changes to the .editorconfig file itself
-				this.rebuildConfigMap();
-				// TODO The transformations should be applied to the .editorconfig`
-				// file as well after the config has been rebuilt
-				// this._rebuildConfigMap().then(applyOnSaveTransformations.bind(
-				// 	undefined,
-				// 	savedDocument,
-				// 	this
-				// ));
-				return;
+		subscriptions.push(workspace.onDidSaveTextDocument(async doc => {
+			if (path.basename(doc.fileName) === '.editorconfig') {
+				this.log('.editorconfig file saved.');
+				await this.rebuildConfigMap();
 			}
 		}));
 
-		subscriptions.push(workspace.onWillSaveTextDocument(e => {
-			const edits = this.calculatePreSaveTransformations(e.document);
-
-			e.waitUntil(Promise.resolve(edits));
+		subscriptions.push(workspace.onWillSaveTextDocument(async e => {
+			e.waitUntil(this.calculatePreSaveTransformations(e.document));
 		}));
 
-		// dispose event subscriptons upon disposal
 		this.disposable = Disposable.from.apply(this, subscriptions);
-
-		// Build the map (cover the case that documents were opened before
-		// my activation)
 		this.rebuildConfigMap();
-
-		// Load the initial workspace configuration
 		this.onConfigChanged();
 	}
 
@@ -98,18 +74,18 @@ class DocumentWatcher implements EditorConfigProvider {
 		return this.defaults;
 	}
 
-	private rebuildConfigMap() {
+	private async rebuildConfigMap() {
 		this.log('Rebuilding config map...');
 		this.docToConfigMap = {};
-		return Promise.all(workspace.textDocuments.map(
+		return await Promise.all(workspace.textDocuments.map(
 			doc => this.onDidOpenDocument(doc)
 		));
 	}
 
-	private onDidOpenDocument(doc: TextDocument) {
+	private async onDidOpenDocument(doc: TextDocument) {
 		if (doc.isUntitled) {
 			this.log('Skipped untitled document.');
-			return Promise.resolve();
+			return;
 		}
 		const fileName = doc.fileName;
 		const relativePath = workspace.asRelativePath(fileName);
@@ -117,24 +93,24 @@ class DocumentWatcher implements EditorConfigProvider {
 
 		if (this.docToConfigMap[fileName]) {
 			this.log('Using configuration map...');
-			this.applyEditorConfigToTextEditor(window.activeTextEditor);
-			return Promise.resolve();
+			await this.applyEditorConfigToTextEditor(window.activeTextEditor);
+			return;
 		}
 
 		this.log('Using EditorConfig core...');
 		return editorconfig.parse(fileName)
-			.then((config: editorconfig.knownProps) => {
+			.then(async (config: editorconfig.knownProps) => {
 				if (config.indent_size === 'tab') {
 					config.indent_size = config.tab_width;
 				}
 
 				this.docToConfigMap[fileName] = config;
 
-				return this.applyEditorConfigToTextEditor(window.activeTextEditor);
+				await this.applyEditorConfigToTextEditor(window.activeTextEditor);
 			});
 	}
 
-	private applyEditorConfigToTextEditor(
+	private async applyEditorConfigToTextEditor(
 		editor: TextEditor,
 	) {
 		if (!editor) {
@@ -161,7 +137,7 @@ class DocumentWatcher implements EditorConfigProvider {
 
 		this.log(`${relativePath}: ${JSON.stringify(newOptions)}`);
 
-		return endOfLineTransform(editorconfig, editor);
+		return await endOfLineTransform(editorconfig, editor);
 	}
 
 	private onConfigChanged() {
@@ -178,15 +154,15 @@ class DocumentWatcher implements EditorConfigProvider {
 		);
 	}
 
-	private calculatePreSaveTransformations(
+	private async calculatePreSaveTransformations(
 		doc: TextDocument
-	): TextEdit[] | void {
+	): Promise<TextEdit[]> {
 		const editorconfig = this.getSettingsForDocument(doc);
 		const relativePath = workspace.asRelativePath(doc.fileName);
 
 		if (!editorconfig) {
 			this.log(`Pre-save: No configuration found for ${relativePath}.`);
-			return;
+			return [];
 		}
 
 		this.log(`Applying pre-save transformations to ${relativePath}.`);
