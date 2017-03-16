@@ -11,9 +11,11 @@ import {
 } from 'vscode';
 import { fromEditorConfig } from './Utils';
 import {
-	endOfLineTransform,
-	trimTrailingWhitespaceTransform,
-	insertFinalNewlineTransform
+	InsertFinalNewline,
+	OnOpenTransformation,
+	PreSaveTransformation,
+	SetEndOfLine,
+	TrimTrailingWhitespace
 } from './transformations';
 import {
 	EditorConfigProvider
@@ -24,6 +26,13 @@ class DocumentWatcher implements EditorConfigProvider {
 	private docToConfigMap: { [fileName: string]: editorconfig.knownProps };
 	private disposable: Disposable;
 	private defaults: TextEditorOptions;
+	private onOpenTransformations: OnOpenTransformation[] = [
+		new SetEndOfLine()
+	];
+	private preSaveTransformations: PreSaveTransformation[] = [
+		new TrimTrailingWhitespace(),
+		new InsertFinalNewline()
+	];
 
 	constructor(
 		private outputChannel = window.createOutputChannel('EditorConfig')
@@ -135,9 +144,20 @@ class DocumentWatcher implements EditorConfigProvider {
 		// tslint:disable-next-line:no-any
 		editor.options = newOptions as any;
 
-		this.log(`${relativePath}: ${JSON.stringify(newOptions)}`);
+		const appliedOptions = { ...newOptions };
 
-		return await endOfLineTransform(editorconfig, editor);
+		const result = await Promise.all(
+			this.onOpenTransformations.map(async transformer => {
+				Object.assign(
+					appliedOptions,
+					(await transformer.transform(editorconfig, editor)).applied
+				);
+			})
+		);
+
+		this.log(`${relativePath}: ${JSON.stringify(appliedOptions)}`);
+
+		return result;
 	}
 
 	private onConfigChanged() {
@@ -167,10 +187,11 @@ class DocumentWatcher implements EditorConfigProvider {
 
 		this.log(`Applying pre-save transformations to ${relativePath}.`);
 
-		return [
-			...insertFinalNewlineTransform(editorconfig, doc),
-			...trimTrailingWhitespaceTransform(editorconfig, doc)
-		];
+		return Array.prototype.concat.call([],
+			...this.preSaveTransformations.map(
+				transformer => transformer.transform(editorconfig, doc)
+			)
+		);
 	}
 }
 
