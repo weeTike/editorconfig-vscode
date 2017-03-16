@@ -1,9 +1,5 @@
-export {
-	transform as endOfLineTransform
-} from './endOfLine';
-export {
-	transform as insertFinalNewlineTransform
-} from './insertFinalNewline';
-export {
-	transform as trimTrailingWhitespaceTransform
-} from './trimTrailingWhitespace';
+export { default as InsertFinalNewline } from './InsertFinalNewline';
+export { default as OnOpenTransformation } from './OnOpenTransformation';
+export { default as PreSaveTransformation } from './PreSaveTransformation';
+export { default as SetEndOfLine } from './SetEndOfLine';
+export { default as TrimTrailingWhitespace } from './TrimTrailingWhitespace';
