@@ -23,8 +23,8 @@ export function getFixturePath(file: string[]) {
 	);
 }
 
-export function delay(ms: number) {
-	return new Promise<void>(function (resolve) {
+export function wait(ms: number) {
+	return new Promise<void>(resolve => {
 		setTimeout(resolve, ms);
 	});
 }
@@ -32,13 +32,13 @@ export function delay(ms: number) {
 async function getTextEditorOptions() {
 	let resolved = false;
 
-	return new Promise<TextEditorOptions>(async (resolve) => {
+	return new Promise<TextEditorOptions>(async resolve => {
 		window.onDidChangeTextEditorOptions(e => {
 			resolved = true;
 			assert.ok(e.options);
 			resolve(e.options);
 		});
-		await delay(100);
+		await wait(100);
 		if (resolved) {
 			return;
 		}

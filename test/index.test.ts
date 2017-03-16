@@ -9,7 +9,7 @@ import {
 import {
 	getFixturePath,
 	getOptionsForFixture,
-	delay
+	wait
 } from './testUtils';
 
 import * as utils from 'vscode-test-utils';
@@ -105,50 +105,50 @@ suite('EditorConfig extension', () => {
 	});
 
 	test('end_of_line = lf', async () => {
-		const doc = await withSetting(
+		const text = await withSetting(
 			'end_of_line',
 			'lf',
 			{
 				contents: 'foo\r\n'
 			}
-		).doc;
-		assert.strictEqual(doc.getText(), 'foo\n',
+		).getText();
+		assert.strictEqual(text, 'foo\n',
 			'editor fails to convert CRLF line endings into LF on open');
 	});
 
 	test('end_of_line = crlf', async () => {
-		const doc = await withSetting(
+		const text = await withSetting(
 			'end_of_line',
 			'crlf',
 			{
 				contents: 'foo\n'
 			}
-		).doc;
-		assert.strictEqual(doc.getText(), 'foo\r\n',
+		).getText();
+		assert.strictEqual(text, 'foo\r\n',
 			'editor fails to convert LF line endings into CRLF on open');
 	});
 
 	test('end_of_line = preserve', async () => {
-		const doc = await withSetting(
+		const text = await withSetting(
 			'end_of_line',
 			'preserve',
 			{
 				contents: 'foo\r\n'
 			}
-		).doc;
-		assert.strictEqual(doc.getText(), 'foo\r\n',
+		).getText();
+		assert.strictEqual(text, 'foo\r\n',
 			'editor fails to preserve CRLF line endings on open');
 	});
 
 	test('end_of_line = undefined', async () => {
-		const doc = await withSetting(
+		const text = await withSetting(
 			'end_of_line',
 			'undefined',
 			{
 				contents: 'foo\r\n'
 			}
-		).doc;
-		assert.strictEqual(doc.getText(), 'foo\r\n',
+		).getText();
+		assert.strictEqual(text, 'foo\r\n',
 			'editor fails to preserve CRLF line endings on open');
 	});
 
@@ -174,17 +174,21 @@ suite('EditorConfig extension', () => {
 function withSetting(
 	rule: string,
 	value: string,
-	options?: {
+	options: {
 		contents?: string;
-		saves?: number;
-	}
+	} = {}
 ) {
-	options = options || {};
 	return {
-		doc: createDoc(options.contents),
-		saveText: async (text: string) => {
-			return await new Promise<string>(async (resolve) => {
-				const doc = await createDoc();
+		async getText() {
+			return (await createDoc(options.contents)).getText();
+		},
+		saveText(text: string) {
+			return new Promise<string>(async resolve => {
+				const doc = await createDoc(options.contents);
+				workspace.onDidChangeTextDocument(doc.save);
+				workspace.onDidSaveTextDocument(savedDoc => {
+					resolve(savedDoc.getText());
+				});
 				const edit = new WorkspaceEdit();
 				edit.insert(doc.uri, new Position(0, 0), text);
 				assert.strictEqual(
@@ -192,10 +196,6 @@ function withSetting(
 					true,
 					'editor fails to apply edit'
 				);
-				workspace.onDidSaveTextDocument(savedDoc => {
-					resolve(savedDoc.getText());
-				});
-				workspace.onDidChangeTextDocument(doc.save);
 			});
 		}
 	};
@@ -208,7 +208,7 @@ function withSetting(
 		]));
 		const doc = await workspace.openTextDocument(filename);
 		await window.showTextDocument(doc);
-		await delay(50);
+		await wait(50); // wait for EditorConfig to apply new settings
 		return doc;
 	}
 }
