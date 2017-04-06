@@ -105,51 +105,45 @@ suite('EditorConfig extension', () => {
 	});
 
 	test('end_of_line = lf', async () => {
-		const text = await withSetting(
+		const savedText = await withSetting(
 			'end_of_line',
 			'lf',
-			{
-				contents: 'foo\r\n'
-			}
-		).getText();
-		assert.strictEqual(text, 'foo\n',
-			'editor fails to convert CRLF line endings into LF on open');
+		).saveText('foo\r\n');
+		assert.strictEqual(savedText, 'foo\n',
+			'editor fails to convert CRLF line endings into LF on save');
 	});
 
 	test('end_of_line = crlf', async () => {
-		const text = await withSetting(
+		const savedText = await withSetting(
 			'end_of_line',
-			'crlf',
-			{
-				contents: 'foo\n'
-			}
-		).getText();
-		assert.strictEqual(text, 'foo\r\n',
-			'editor fails to convert LF line endings into CRLF on open');
+			'crlf'
+		).saveText('foo\n');
+		assert.strictEqual(savedText, 'foo\r\n',
+			'editor fails to convert LF line endings into CRLF on save');
 	});
 
 	test('end_of_line = preserve', async () => {
-		const text = await withSetting(
+		const savedText = await withSetting(
 			'end_of_line',
 			'preserve',
 			{
-				contents: 'foo\r\n'
+				contents: '\r\n'
 			}
-		).getText();
-		assert.strictEqual(text, 'foo\r\n',
-			'editor fails to preserve CRLF line endings on open');
+		).saveText('foo');
+		assert.strictEqual(savedText, 'foo\r\n',
+			'editor fails to preserve CRLF line endings on save');
 	});
 
 	test('end_of_line = undefined', async () => {
-		const text = await withSetting(
+		const savedText = await withSetting(
 			'end_of_line',
 			'undefined',
 			{
-				contents: 'foo\r\n'
+				contents: '\r\n'
 			}
-		).getText();
-		assert.strictEqual(text, 'foo\r\n',
-			'editor fails to preserve CRLF line endings on open');
+		).saveText('foo');
+		assert.strictEqual(savedText, 'foo\r\n',
+			'editor fails to preserve CRLF line endings on save');
 	});
 
 	test('detect indentation', async () => {

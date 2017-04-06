@@ -12,7 +12,6 @@ import {
 import { fromEditorConfig } from './Utils';
 import {
 	InsertFinalNewline,
-	OnOpenTransformation,
 	PreSaveTransformation,
 	SetEndOfLine,
 	TrimTrailingWhitespace
@@ -26,10 +25,8 @@ class DocumentWatcher implements EditorConfigProvider {
 	private docToConfigMap: { [fileName: string]: editorconfig.knownProps };
 	private disposable: Disposable;
 	private defaults: TextEditorOptions;
-	private onOpenTransformations: OnOpenTransformation[] = [
-		new SetEndOfLine()
-	];
 	private preSaveTransformations: PreSaveTransformation[] = [
+		new SetEndOfLine(),
 		new TrimTrailingWhitespace(),
 		new InsertFinalNewline()
 	];
@@ -144,20 +141,7 @@ class DocumentWatcher implements EditorConfigProvider {
 		// tslint:disable-next-line:no-any
 		editor.options = newOptions as any;
 
-		const appliedOptions = { ...newOptions };
-
-		const result = await Promise.all(
-			this.onOpenTransformations.map(async transformer => {
-				Object.assign(
-					appliedOptions,
-					(await transformer.transform(editorconfig, editor)).applied
-				);
-			})
-		);
-
-		this.log(`${relativePath}: ${JSON.stringify(appliedOptions)}`);
-
-		return result;
+		this.log(`${relativePath}: ${JSON.stringify(newOptions)}`);
 	}
 
 	private onConfigChanged() {
