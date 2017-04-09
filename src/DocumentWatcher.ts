@@ -4,6 +4,7 @@ import {
 	window,
 	workspace,
 	Disposable,
+	Selection,
 	TextDocument,
 	TextEditor,
 	TextEditorOptions,
@@ -56,7 +57,17 @@ class DocumentWatcher implements EditorConfigProvider {
 		}));
 
 		subscriptions.push(workspace.onWillSaveTextDocument(async e => {
-			e.waitUntil(this.calculatePreSaveTransformations(e.document));
+			let selections: Selection[];
+			if (window.activeTextEditor.document === e.document) {
+				selections = window.activeTextEditor.selections;
+			}
+			const transformations = this.calculatePreSaveTransformations(e.document);
+			e.waitUntil(transformations);
+			if (selections) {
+				transformations.then(() => {
+					window.activeTextEditor.selections = selections;
+				});
+			}
 		}));
 
 		this.disposable = Disposable.from.apply(this, subscriptions);
