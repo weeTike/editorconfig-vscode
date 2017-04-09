@@ -181,7 +181,6 @@ function withSetting(
 				const doc = await createDoc(options.contents);
 				workspace.onDidChangeTextDocument(doc.save);
 				workspace.onDidSaveTextDocument(savedDoc => {
-					assert.strictEqual(savedDoc.isDirty, false, 'dirty saved doc');
 					resolve(savedDoc.getText());
 				});
 				const edit = new WorkspaceEdit();

@@ -13,7 +13,6 @@ import {
 import { fromEditorConfig } from './Utils';
 import {
 	InsertFinalNewline,
-	PreSaveCommand,
 	PreSaveTransformation,
 	SetEndOfLine,
 	TrimTrailingWhitespace
@@ -27,8 +26,7 @@ class DocumentWatcher implements EditorConfigProvider {
 	private docToConfigMap: { [fileName: string]: editorconfig.knownProps };
 	private disposable: Disposable;
 	private defaults: TextEditorOptions;
-	private preSaveTransformations:
-		Array<PreSaveTransformation | PreSaveCommand> = [
+	private preSaveTransformations: PreSaveTransformation[] = [
 		new SetEndOfLine(),
 		new TrimTrailingWhitespace(),
 		new InsertFinalNewline()
@@ -188,9 +186,8 @@ class DocumentWatcher implements EditorConfigProvider {
 			...this.preSaveTransformations.map(
 				transformer => {
 					const edits = transformer.transform(editorconfig, doc);
-					if (edits instanceof Promise) {
-						edits.catch(err => this.log(err.message));
-						return [];
+					if (edits instanceof Error) {
+						this.log(edits.message);
 					}
 					return edits;
 				}
