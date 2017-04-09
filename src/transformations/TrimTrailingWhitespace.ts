@@ -1,11 +1,13 @@
 import * as editorconfig from 'editorconfig';
 import {
+	commands,
 	workspace,
 	TextDocument,
 	TextLine,
 	Position,
 	Range,
-	TextEdit
+	TextEdit,
+	window
 } from 'vscode';
 
 import PreSaveTransformation from './PreSaveTransformation';
@@ -29,6 +31,11 @@ class TrimTrailingWhitespace extends PreSaveTransformation {
 		}
 
 		if (!editorconfig.trim_trailing_whitespace) {
+			return [];
+		}
+
+		if (window.activeTextEditor.document === doc) {
+			commands.executeCommand('editor.action.trimTrailingWhitespace');
 			return [];
 		}
 

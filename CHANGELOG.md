@@ -1,3 +1,6 @@
+## 0.6.5
+- Restore non-native trailing whitespace trims on inactive editor documents (save all).
+
 ## 0.6.4
 - Use native `editor.action.trimTrailingWhitespace`.
 
