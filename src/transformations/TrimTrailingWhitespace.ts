@@ -1,7 +1,6 @@
 import * as editorconfig from 'editorconfig';
 import {
 	workspace,
-	window,
 	TextDocument,
 	TextLine,
 	Position,
@@ -19,31 +18,30 @@ class TrimTrailingWhitespace extends PreSaveTransformation {
 		const editorTrimsWhitespace = workspace
 			.getConfiguration('files')
 			.get('trimTrailingWhitespace', false);
-		const trimmingOperations: TextEdit[] = [];
 
 		if (editorTrimsWhitespace) {
 			if (editorconfig.trim_trailing_whitespace === false) {
-				window.showWarningMessage([
+				return new Error([
 					'The trimTrailingWhitespace workspace or user setting is',
 					'overriding the EditorConfig setting for this file.'
 				].join(' '));
 			}
-			return trimmingOperations;
 		}
 
 		if (!editorconfig.trim_trailing_whitespace) {
-			return trimmingOperations;
+			return [];
 		}
 
+		const edits: TextEdit[] = [];
 		for (let i = 0; i < doc.lineCount; i++) {
 			const edit = this.trimLineTrailingWhitespace(doc.lineAt(i));
 
 			if (edit) {
-				trimmingOperations.push(edit);
+				edits.push(edit);
 			}
 		}
 
-		return trimmingOperations;
+		return edits;
 	}
 
 	private trimLineTrailingWhitespace(line: TextLine): TextEdit | void {
