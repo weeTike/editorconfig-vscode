@@ -1,3 +1,6 @@
+## 0.6.4
+- Use native `editor.action.trimTrailingWhitespace`.
+
 ## 0.6.3
 - Use new `TextEdit.setEndOfLine` API.
 - Preserve selections on file save.
