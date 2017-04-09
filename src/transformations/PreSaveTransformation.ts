@@ -5,7 +5,7 @@ abstract class PreSaveTransformation {
 	abstract transform(
 		editorconfig: editorconfig.knownProps,
 		doc?: TextDocument
-	): TextEdit[]
+	): TextEdit[] | Error
 }
 
 export default PreSaveTransformation;
