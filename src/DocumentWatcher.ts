@@ -184,7 +184,13 @@ class DocumentWatcher implements EditorConfigProvider {
 
 		return Array.prototype.concat.call([],
 			...this.preSaveTransformations.map(
-				transformer => transformer.transform(editorconfig, doc)
+				transformer => {
+					const edits = transformer.transform(editorconfig, doc);
+					if (edits instanceof Error) {
+						this.log(edits.message);
+					}
+					return edits;
+				}
 			)
 		);
 	}
