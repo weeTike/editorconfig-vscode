@@ -1,3 +1,8 @@
+## 0.6.3
+- Use new `TextEdit.setEndOfLine` API.
+- Preserve selections on file save.
+- Demote warning message to output channel.
+
 ## 0.6.2
 - Save/restore selections (cursors) during file save.
 
