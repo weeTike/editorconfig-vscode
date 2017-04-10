@@ -1,3 +1,6 @@
+## 0.7.0
+- Assume new/untitled docs are @ root path.
+
 ## 0.6.5
 - Restore non-native trailing whitespace trims on inactive editor documents (save all).
 

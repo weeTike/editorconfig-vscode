@@ -84,7 +84,13 @@ class DocumentWatcher implements EditorConfigProvider {
 	}
 
 	public getSettingsForDocument(doc: TextDocument) {
-		return this.docToConfigMap[doc.fileName];
+		return this.docToConfigMap[this.getFileName(doc)];
+	}
+
+	private getFileName(doc: TextDocument) {
+		return (doc.isUntitled)
+			? path.join(workspace.rootPath, doc.fileName)
+			: doc.fileName;
 	}
 
 	public getDefaultSettings() {
@@ -100,11 +106,7 @@ class DocumentWatcher implements EditorConfigProvider {
 	}
 
 	private async onDidOpenDocument(doc: TextDocument) {
-		if (doc.isUntitled) {
-			this.log('Skipped untitled document.');
-			return;
-		}
-		const fileName = doc.fileName;
+		const fileName = this.getFileName(doc);
 		const relativePath = workspace.asRelativePath(fileName);
 		this.log(`Applying configuration to ${relativePath}...`);
 
