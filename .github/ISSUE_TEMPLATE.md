@@ -26,15 +26,14 @@ indent_size = 2
 
 Are there any other relevant `.editorconfig` files in your project? Yes / No
 
-| Visual Studio Code Setting     | Default | User | Workspace |
-|--------------------------------|---------|------|-----------|
-| `editor.insertSpaces`          | `true`  |      |           |
-| `editor.tabSize`               | `4`     |      |           |
-| `editor.trimAutoWhitespace`    | `true`  |      |           |
-| `files.autoSave`               | `"off"` |      |           |
-| `files.autoSaveDelay`          | `1000`  |      |           |
-| `files.insertFinalNewline`     | `false` |      |           |
-| `files.trimTrailingWhitespace` | `false` |      |           |
+| Visual Studio Code Setting     | Default | User    | Workspace |
+|--------------------------------|---------|---------|-----------|
+| `editor.insertSpaces`          | `true`  | `____`  | `____`    |
+| `editor.tabSize`               | `4`     | `_`     | `_`       |
+| `editor.trimAutoWhitespace`    | `true`  | `____`  | `____`    |
+| `files.autoSave`               | `"off"` | `"___"` | `"___"`   |
+| `files.insertFinalNewline`     | `false` | `_____` | `_____`   |
+| `files.trimTrailingWhitespace` | `false` | `_____` | `_____`   |
 
 ### File opened
 
@@ -42,7 +41,7 @@ Are there any other relevant `.editorconfig` files in your project? Yes / No
 
 ### Expected behavior
 
-```
+```ini
 indent_size = 2
 ```
 
