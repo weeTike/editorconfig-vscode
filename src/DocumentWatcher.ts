@@ -1,4 +1,5 @@
 import * as editorconfig from 'editorconfig';
+import * as compact from 'lodash.compact';
 import * as path from 'path';
 import {
 	window,
@@ -93,7 +94,12 @@ class DocumentWatcher implements EditorConfigProvider {
 			return doc.fileName;
 		}
 		const ext = languageExtensionMap[doc.languageId] || doc.languageId;
-		return path.join(workspace.rootPath, `${doc.fileName}.${ext}`);
+		return path.join(
+			...compact([
+				workspace.rootPath,
+				`${doc.fileName}.${ext}`
+			])
+		);
 	}
 
 	public getDefaultSettings() {
