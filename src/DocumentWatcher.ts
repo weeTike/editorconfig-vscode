@@ -187,8 +187,6 @@ class DocumentWatcher implements EditorConfigProvider {
 			return [];
 		}
 
-		this.log(`${relativePath}: Applying pre-save transformations...`);
-
 		return Array.prototype.concat.call([],
 			...this.preSaveTransformations.map(
 				transformer => {
