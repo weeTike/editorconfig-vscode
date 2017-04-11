@@ -11,9 +11,9 @@ import PreSaveTransformation from './PreSaveTransformation';
 export default class InsertFinalNewline extends PreSaveTransformation {
 
 	private lineEndings = {
-		cr: '\r',
-		crlf: '\r\n',
-		lf: '\n'
+		CR: '\r',
+		CRLF: '\r\n',
+		LF: '\n'
 	};
 
 	transform(
@@ -26,15 +26,19 @@ export default class InsertFinalNewline extends PreSaveTransformation {
 		if (!editorconfig.insert_final_newline
 			|| lineCount === 0
 			|| lastLine.isEmptyOrWhitespace) {
-			return [];
+			return { edits: [] };
 		}
 
-		const position = new Position(lastLine.lineNumber, lastLine.text.length);
+		const position = new Position(
+			lastLine.lineNumber,
+			lastLine.text.length
+		);
 
-		return [
-			TextEdit.insert(position, this.lineEndings[
-				get(editorconfig, 'end_of_line', 'lf').toLowerCase()
-			])
-		];
+		const eol = get(editorconfig, 'end_of_line', 'lf').toUpperCase();
+
+		return {
+			edits: [ TextEdit.insert(position, this.lineEndings[eol]) ],
+			message: `insertFinalNewline(${eol})`
+		};
 	}
 }

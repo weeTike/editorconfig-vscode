@@ -1,3 +1,6 @@
+## 0.9.0
+- Improve output channel messaging.
+
 ## 0.8.0
 - Use default language extension for untitled documents.
 
