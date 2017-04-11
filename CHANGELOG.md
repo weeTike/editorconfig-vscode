@@ -1,3 +1,6 @@
+## 0.8.0
+- Use default language extension for untitled documents.
+
 ## 0.7.0
 - Assume new/untitled docs are @ root path.
 

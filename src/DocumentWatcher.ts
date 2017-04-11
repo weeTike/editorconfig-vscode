@@ -10,6 +10,7 @@ import {
 	TextEditorOptions,
 	TextEdit
 } from 'vscode';
+import languageExtensionMap from './languageExtensionMap';
 import { fromEditorConfig } from './Utils';
 import {
 	InsertFinalNewline,
@@ -88,9 +89,11 @@ class DocumentWatcher implements EditorConfigProvider {
 	}
 
 	private getFileName(doc: TextDocument) {
-		return (doc.isUntitled)
-			? path.join(workspace.rootPath, doc.fileName)
-			: doc.fileName;
+		if (!doc.isUntitled) {
+			return doc.fileName;
+		}
+		const ext = languageExtensionMap[doc.languageId] || doc.languageId;
+		return path.join(workspace.rootPath, `${doc.fileName}.${ext}`);
 	}
 
 	public getDefaultSettings() {
@@ -106,6 +109,9 @@ class DocumentWatcher implements EditorConfigProvider {
 	}
 
 	private async onDidOpenDocument(doc: TextDocument) {
+		if (doc.languageId === 'Log') {
+			return;
+		}
 		const fileName = this.getFileName(doc);
 		const relativePath = workspace.asRelativePath(fileName);
 		this.log(`Applying configuration to ${relativePath}...`);
