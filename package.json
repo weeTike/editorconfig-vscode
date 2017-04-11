@@ -46,6 +46,7 @@
     "@types/mocha": "^2.2.40",
     "@types/node": "^7.0.12",
     "editorconfig": "^0.13.2",
+    "rimraf": "^2.6.1",
     "tslint": "^4.5.1",
     "typescript": "^2.2.2",
     "vscode": "^1.1.0",
@@ -53,7 +54,7 @@
   },
   "scripts": {
     "postinstall": "node ./node_modules/vscode/bin/install",
-    "compile": "tsc",
+    "compile": "rimraf out && tsc",
     "lint": "tslint --project tsconfig.json",
     "pretest": "npm run lint && npm run compile",
     "test": "node ./node_modules/vscode/bin/test",
