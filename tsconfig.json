@@ -11,7 +11,8 @@
 		"lib": [
 			"es6"
 		],
-		"sourceMap": true
+		"sourceMap": true,
+		"forceConsistentCasingInFileNames": true
 	},
 	"include": [
 		"node_modules/@types/node/index.d.ts",

@@ -1,3 +1,6 @@
+## 0.9.2
+- Improve/simplify output channel messaging.
+
 ## 0.9.1
 - Fix [issue 135](https://github.com/editorconfig/editorconfig-vscode/issues/135): extension does not load on Linux systems, due to case sensitivity.
 
