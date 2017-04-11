@@ -114,15 +114,14 @@ class DocumentWatcher implements EditorConfigProvider {
 		}
 		const fileName = this.getFileName(doc);
 		const relativePath = workspace.asRelativePath(fileName);
-		this.log(`Applying configuration to ${relativePath}...`);
 
 		if (this.docToConfigMap[fileName]) {
-			this.log('Using configuration map...');
+			this.log(`${relativePath}: Applying configuration map...`);
 			await this.applyEditorConfigToTextEditor(window.activeTextEditor);
 			return;
 		}
 
-		this.log('Using EditorConfig core...');
+		this.log(`${relativePath}: Using EditorConfig core...`);
 		return editorconfig.parse(fileName)
 			.then(async (config: editorconfig.knownProps) => {
 				if (config.indent_size === 'tab') {
@@ -148,7 +147,7 @@ class DocumentWatcher implements EditorConfigProvider {
 		const editorconfig = this.getSettingsForDocument(doc);
 
 		if (!editorconfig) {
-			this.log(`No configuration for ${relativePath}.`);
+			this.log(`${relativePath}: No configuration.`);
 			return Promise.resolve();
 		}
 
@@ -184,18 +183,24 @@ class DocumentWatcher implements EditorConfigProvider {
 		const relativePath = workspace.asRelativePath(doc.fileName);
 
 		if (!editorconfig) {
-			this.log(`Pre-save: No configuration found for ${relativePath}.`);
+			this.log(`${relativePath}: No configuration found for pre-save.`);
 			return [];
 		}
 
-		this.log(`Applying pre-save transformations to ${relativePath}.`);
+		this.log(`${relativePath}: Applying pre-save transformations...`);
 
 		return Array.prototype.concat.call([],
 			...this.preSaveTransformations.map(
 				transformer => {
-					const edits = transformer.transform(editorconfig, doc);
+					const { edits, message } = transformer.transform(
+						editorconfig,
+						doc
+					);
 					if (edits instanceof Error) {
-						this.log(edits.message);
+						this.log(`${relativePath}: ${edits.message}`);
+					}
+					if (message) {
+						this.log(`${relativePath}: ${message}`);
 					}
 					return edits;
 				}

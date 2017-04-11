@@ -9,19 +9,20 @@ import PreSaveTransformation from './PreSaveTransformation';
 class SetEndOfLine extends PreSaveTransformation {
 
 	private eolMap = {
-		lf: EndOfLine.LF,
-		crlf: EndOfLine.CRLF
+		LF: EndOfLine.LF,
+		CRLF: EndOfLine.CRLF
 	};
 
 	transform(
 		editorconfig: editorconfig.knownProps
-	): TextEdit[] {
-		const eolKey = (editorconfig.end_of_line || '').toLowerCase();
+	) {
+		const eolKey = (editorconfig.end_of_line || '').toUpperCase();
 		const eol = this.eolMap[eolKey];
 
-		return (eol)
-			? [ TextEdit.setEndOfLine(eol) ]
-			: [];
+		return (eol) ? {
+			edits: [ TextEdit.setEndOfLine(eol) ],
+			message: `setEndOfLine(${eolKey})`
+		} : { edits: [] };
 	}
 }
 
