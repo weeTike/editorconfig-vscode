@@ -4,13 +4,6 @@ import {
 	workspace,
 	window
 } from 'vscode';
-import * as Utils from '../Utils';
-
-const propsToGenerate = [
-	'indent_style',
-	'indent_size',
-	'tab_width'
-];
 
 /**
  * Generate a .editorconfig file in the root of the workspace based on the
@@ -45,22 +38,46 @@ export function generateEditorConfig() {
 	});
 
 	function writeFile() {
-		const contents = ['root = true', '', '[*]'];
-		const editorConfigurationNode = workspace.getConfiguration('editor');
-		const settings = Utils.toEditorConfig({
-			insertSpaces: editorConfigurationNode
-				.get<string | boolean>('insertSpaces'),
-			tabSize: editorConfigurationNode
-				.get<string | number>('tabSize')
-		});
+		const editor = workspace.getConfiguration('editor');
+		const files = workspace.getConfiguration('files');
 
-		for (const setting of propsToGenerate) {
-			if (settings.hasOwnProperty(setting)) {
-				contents.push(`${setting} = ${settings[setting]}`);
+		const settingsLines = ['root = true', '', '[*]'];
+		function addSetting(key: string, value?: string | number | boolean): void {
+			if (value !== undefined) {
+				settingsLines.push(`${key} = ${value}`);
 			}
 		}
 
-		fs.writeFile(editorConfigFile, contents.join('\n'), err => {
+		const insertSpaces = editor.get<boolean>('insertSpaces');
+
+		addSetting('indent_style',
+			insertSpaces ? 'space' : 'tab');
+
+		addSetting(insertSpaces ? 'indent_size' : 'tab_size',
+			editor.get<number>('tabSize'));
+
+		const eolMap = {
+			'\r\n': 'crlf',
+			'\n': 'lf',
+		};
+		addSetting('end_of_line', eolMap[files.get<string>('eol')]);
+
+		const encodingMap = {
+			'iso88591': 'latin1',
+			'utf8': 'utf-8',
+			'utf8bom': 'utf-8-bom',
+			'utf16be': 'utf-16-be',
+			'utf16le': 'utf-16-le',
+		};
+		addSetting('charset', encodingMap[files.get<string>('encoding')]);
+
+		addSetting('trim_trailing_whitespace',
+			files.get<boolean>('trimTrailingWhitespace'));
+
+		addSetting('insert_final_newline',
+			files.get<boolean>('insertFinalNewline'));
+
+		fs.writeFile(editorConfigFile, settingsLines.join('\n'), err => {
 			if (err) {
 				window.showErrorMessage(err.message);
 				return;
