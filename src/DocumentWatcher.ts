@@ -1,5 +1,6 @@
 import * as editorconfig from 'editorconfig';
 import * as compact from 'lodash.compact';
+import * as get from 'lodash.get';
 import * as path from 'path';
 import {
 	window,
@@ -60,15 +61,18 @@ class DocumentWatcher implements EditorConfigProvider {
 
 		subscriptions.push(workspace.onWillSaveTextDocument(async e => {
 			let selections: Selection[];
-			if (window.activeTextEditor !== undefined &&
-				window.activeTextEditor.document === e.document) {
+			const activeEditor = window.activeTextEditor;
+			const activeDoc = get(activeEditor, 'document');
+			if (activeDoc && activeDoc === e.document) {
 				selections = window.activeTextEditor.selections;
 			}
-			const transformations = this.calculatePreSaveTransformations(e.document);
+			const transformations = this.calculatePreSaveTransformations(
+				e.document
+			);
 			e.waitUntil(transformations);
 			if (selections) {
 				transformations.then(() => {
-					window.activeTextEditor.selections = selections;
+					activeEditor.selections = selections;
 				});
 			}
 		}));

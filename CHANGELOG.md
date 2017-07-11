@@ -1,3 +1,6 @@
+## 0.9.4
+- Fix `document` of `undefined` error.
+
 ## 0.9.3
 - Fix workspace issue on Linux [`#145`](https://github.com/editorconfig/editorconfig-vscode/issues/145).
 
