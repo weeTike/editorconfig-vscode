@@ -17,10 +17,7 @@ export default class InsertFinalNewline extends PreSaveTransformation {
 		LF: '\n'
 	};
 
-	private deleteFinalNewlines = (doc) => {
-		const lineCount = doc.lineCount;
-		const lastLine = doc.lineAt(lineCount - 1);
-
+	private deleteFinalNewlines = (doc, lineCount, lastLine) => {
 		let realLastLine = lastLine;
 		let realLastLineDetected = false;
 		let lineCounter = 1;
@@ -55,10 +52,7 @@ export default class InsertFinalNewline extends PreSaveTransformation {
 		return { edits: [] };
 	}
 
-	private insertFinalNewline = (editorconfigProperties, doc) => {
-		const lineCount = doc.lineCount;
-		const lastLine = doc.lineAt(lineCount - 1);
-
+	private insertFinalNewline = (editorconfigProperties, lastLine) => {
 		const position = new Position(
 			lastLine.lineNumber,
 			lastLine.text.length
@@ -85,12 +79,12 @@ export default class InsertFinalNewline extends PreSaveTransformation {
 
 		if (editorconfigProperties.insert_final_newline
 			&& !lastLine.isEmptyOrWhitespace) {
-				return this.insertFinalNewline(editorconfigProperties, doc);
+				return this.insertFinalNewline(editorconfigProperties, lastLine);
 		}
 
 		if (!editorconfigProperties.insert_final_newline
 			&& lastLine.isEmptyOrWhitespace) {
-			return this.deleteFinalNewlines(doc);
+			return this.deleteFinalNewlines(doc, lineCount, lastLine);
 		}
 
 		return this.doNothing();
