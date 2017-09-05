@@ -107,8 +107,8 @@ suite('EditorConfig extension', () => {
 		const savedText = await withSetting(
 			'end_of_line',
 			'lf',
-		).saveText('foo\r\n');
-		assert.strictEqual(savedText, 'foo\n',
+		).saveText('foo\r\nbar');
+		assert.strictEqual(savedText, 'foo\nbar',
 			'editor fails to convert CRLF line endings into LF on save');
 	});
 
@@ -116,8 +116,8 @@ suite('EditorConfig extension', () => {
 		const savedText = await withSetting(
 			'end_of_line',
 			'crlf'
-		).saveText('foo\n');
-		assert.strictEqual(savedText, 'foo\r\n',
+		).saveText('foo\nbar');
+		assert.strictEqual(savedText, 'foo\r\nbar',
 			'editor fails to convert LF line endings into CRLF on save');
 	});
 
@@ -128,8 +128,8 @@ suite('EditorConfig extension', () => {
 			{
 				contents: '\r\n'
 			}
-		).saveText('foo');
-		assert.strictEqual(savedText, 'foo\r\n',
+		).saveText('foo\r\nbar');
+		assert.strictEqual(savedText, 'foo\r\nbar',
 			'editor fails to preserve CRLF line endings on save');
 	});
 
@@ -140,8 +140,8 @@ suite('EditorConfig extension', () => {
 			{
 				contents: '\r\n'
 			}
-		).saveText('foo');
-		assert.strictEqual(savedText, 'foo\r\n',
+		).saveText('foo\r\nbar');
+		assert.strictEqual(savedText, 'foo\r\nbar',
 			'editor fails to preserve CRLF line endings on save');
 	});
 
