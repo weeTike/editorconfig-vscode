@@ -1,3 +1,6 @@
+## 0.10.0
+- Remove final newlines when `insert_final_newline = false` [`#166`](https://github.com/editorconfig/editorconfig-vscode/pull/166).
+
 ## 0.9.4
 - Fix `document` of `undefined` error.
 
