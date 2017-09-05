@@ -77,13 +77,12 @@ suite('EditorConfig extension', () => {
 	});
 
 	test('insert_final_newline = false', async () => {
-		const text = `foo${os.EOL}`;
 		const savedText = await withSetting(
 			'insert_final_newline',
 			'false'
-		).saveText(text);
-		assert.strictEqual(savedText, text,
-			'editor fails to preserve final newline on save');
+		).saveText(`foo${os.EOL}`);
+		assert.strictEqual(savedText, `foo`,
+			'editor fails to remove final newline/s on save');
 	});
 
 	test('trim_trailing_whitespace = true', async () => {
