@@ -1,3 +1,6 @@
+## 0.10.1
+- Rollback [`#166`](https://github.com/editorconfig/editorconfig-vscode/pull/166) until we can ensure final newlines are not removed by default.
+
 ## 0.10.0
 - Remove final newlines when `insert_final_newline = false` [`#166`](https://github.com/editorconfig/editorconfig-vscode/pull/166).
 
