@@ -7,7 +7,8 @@ import {
 	Position,
 	Range,
 	TextEdit,
-	window
+	window,
+	TextDocumentSaveReason
 } from 'vscode';
 
 import PreSaveTransformation from './PreSaveTransformation';
@@ -15,7 +16,8 @@ import PreSaveTransformation from './PreSaveTransformation';
 class TrimTrailingWhitespace extends PreSaveTransformation {
 	transform(
 		editorconfigProperties: KnownProps,
-		doc: TextDocument
+		doc: TextDocument,
+		reason: TextDocumentSaveReason
 	) {
 		const editorTrimsWhitespace = workspace
 			.getConfiguration('files')
@@ -41,7 +43,10 @@ class TrimTrailingWhitespace extends PreSaveTransformation {
 		}
 
 		if (window.activeTextEditor.document === doc) {
-			commands.executeCommand('editor.action.trimTrailingWhitespace');
+			const trimReason =
+				(reason !== TextDocumentSaveReason.Manual) ? 'auto-save' : null;
+			commands.executeCommand('editor.action.trimTrailingWhitespace',
+				{ reason: trimReason });
 			return {
 				edits: [],
 				message: 'editor.action.trimTrailingWhitespace'
