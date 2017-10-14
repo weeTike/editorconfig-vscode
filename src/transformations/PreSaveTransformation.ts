@@ -3,7 +3,7 @@ import { TextDocument, TextEdit } from 'vscode';
 
 abstract class PreSaveTransformation {
 	abstract transform(
-		editorconfig: editorconfig.knownProps,
+		editorconfig: editorconfig.KnownProps,
 		doc?: TextDocument
 	): {
 		edits: TextEdit[] | Error;

@@ -11,7 +11,7 @@ import {
  * Convert .editorconfig values to vscode editor options
  */
 export function fromEditorConfig(
-	config: editorconfig.knownProps,
+	config: editorconfig.KnownProps,
 	defaults: TextEditorOptions
 ): TextEditorOptions {
 	const resolved: TextEditorOptions = {
@@ -35,7 +35,7 @@ export function fromEditorConfig(
  * Convert vscode editor options to .editorconfig values
  */
 export function toEditorConfig(options: TextEditorOptions) {
-	const result: editorconfig.knownProps = {};
+	const result: editorconfig.KnownProps = {};
 
 	switch (options.insertSpaces) {
 		case true:

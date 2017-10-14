@@ -14,7 +14,7 @@ class SetEndOfLine extends PreSaveTransformation {
 	};
 
 	transform(
-		editorconfigProperties: editorconfig.knownProps
+		editorconfigProperties: editorconfig.KnownProps
 	) {
 		const eolKey = (editorconfigProperties.end_of_line || '').toUpperCase();
 		const eol = this.eolMap[eolKey];

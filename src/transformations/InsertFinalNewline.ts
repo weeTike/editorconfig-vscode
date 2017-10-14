@@ -17,13 +17,13 @@ export default class InsertFinalNewline extends PreSaveTransformation {
 	};
 
 	transform(
-		editorconfigProperties: editorconfig.knownProps,
+		editorconfigProperties: editorconfig.KnownProps,
 		doc: TextDocument
 	) {
 		const lineCount = doc.lineCount;
 		const lastLine = doc.lineAt(lineCount - 1);
 
-		if (!editorconfigProperties.insert_final_newline
+		if (shouldIgnoreSetting(editorconfigProperties.insert_final_newline)
 			|| lineCount === 0
 			|| lastLine.isEmptyOrWhitespace) {
 			return { edits: [] };
@@ -40,5 +40,9 @@ export default class InsertFinalNewline extends PreSaveTransformation {
 			edits: [ TextEdit.insert(position, this.lineEndings[eol]) ],
 			message: `insertFinalNewline(${eol})`
 		};
+
+		function shouldIgnoreSetting(value) {
+			return !value || value === 'unset';
+		}
 	}
 }

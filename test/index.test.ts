@@ -86,6 +86,23 @@ suite('EditorConfig extension', () => {
 			'editor fails to preserve final newline on save');
 	});
 
+	test('insert_final_newline = unset', async () => {
+		const text = `foo${os.EOL}`;
+		const savedText1 = await withSetting(
+			'insert_final_newline',
+			'unset'
+		).saveText(text);
+		assert.strictEqual(savedText1, text,
+			'editor fails to preserve final newline on save');
+
+		const savedText2 = await withSetting(
+			'insert_final_newline',
+			'unset-2'
+		).saveText('foo');
+		assert.strictEqual(savedText2, 'foo',
+			'editor fails to preserve no final newline on save');
+	});
+
 	test('trim_trailing_whitespace = true', async () => {
 		const savedText = await withSetting(
 			'trim_trailing_whitespace',
@@ -99,6 +116,15 @@ suite('EditorConfig extension', () => {
 		const savedText = await withSetting(
 			'trim_trailing_whitespace',
 			'false'
+		).saveText('foo  ');
+		assert.strictEqual(savedText, 'foo  ',
+			'editor fails to preserve trailing whitespace on save');
+	});
+
+	test('trim_trailing_whitespace = unset', async () => {
+		const savedText = await withSetting(
+			'trim_trailing_whitespace',
+			'unset'
 		).saveText('foo  ');
 		assert.strictEqual(savedText, 'foo  ',
 			'editor fails to preserve trailing whitespace on save');
@@ -122,22 +148,10 @@ suite('EditorConfig extension', () => {
 			'editor fails to convert LF line endings into CRLF on save');
 	});
 
-	test('end_of_line = preserve', async () => {
+	test('end_of_line = unset', async () => {
 		const savedText = await withSetting(
 			'end_of_line',
-			'preserve',
-			{
-				contents: '\r\n'
-			}
-		).saveText('foo');
-		assert.strictEqual(savedText, 'foo\r\n',
-			'editor fails to preserve CRLF line endings on save');
-	});
-
-	test('end_of_line = undefined', async () => {
-		const savedText = await withSetting(
-			'end_of_line',
-			'undefined',
+			'unset',
 			{
 				contents: '\r\n'
 			}

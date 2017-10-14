@@ -14,7 +14,7 @@ import PreSaveTransformation from './PreSaveTransformation';
 
 class TrimTrailingWhitespace extends PreSaveTransformation {
 	transform(
-		editorconfigProperties: editorconfig.knownProps,
+		editorconfigProperties: editorconfig.KnownProps,
 		doc: TextDocument
 	) {
 		const editorTrimsWhitespace = workspace
@@ -34,7 +34,9 @@ class TrimTrailingWhitespace extends PreSaveTransformation {
 			}
 		}
 
-		if (!editorconfigProperties.trim_trailing_whitespace) {
+		if (shouldIgnoreSetting(
+			editorconfigProperties.trim_trailing_whitespace
+		)) {
 			return { edits: [] };
 		}
 
@@ -59,6 +61,10 @@ class TrimTrailingWhitespace extends PreSaveTransformation {
 			edits,
 			message: 'trimTrailingWhitespace()'
 		};
+
+		function shouldIgnoreSetting(value) {
+			return !value || value === 'unset';
+		}
 	}
 
 	private trimLineTrailingWhitespace(line: TextLine): TextEdit | void {

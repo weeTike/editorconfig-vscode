@@ -3,7 +3,7 @@
   "displayName": "EditorConfig for VS Code",
   "description": "EditorConfig Support for Visual Studio Code",
   "publisher": "EditorConfig",
-  "version": "0.10.1",
+  "version": "0.11.0",
   "icon": "EditorConfig_icon.png",
   "engines": {
     "vscode": "^1.11.0"
@@ -49,7 +49,7 @@
     "rimraf": "^2.6.2",
     "tslint": "^5.7.0",
     "typescript": "^2.5.3",
-    "vscode": "^1.1.5",
+    "vscode": "^1.1.6",
     "vscode-test-utils": "0.0.9"
   },
   "scripts": {

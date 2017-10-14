@@ -26,7 +26,7 @@ import {
 
 class DocumentWatcher implements EditorConfigProvider {
 
-	private docToConfigMap: { [fileName: string]: editorconfig.knownProps };
+	private docToConfigMap: { [fileName: string]: editorconfig.KnownProps };
 	private disposable: Disposable;
 	private defaults: TextEditorOptions;
 	private preSaveTransformations: PreSaveTransformation[] = [
@@ -134,7 +134,7 @@ class DocumentWatcher implements EditorConfigProvider {
 
 		this.log(`${relativePath}: Using EditorConfig core...`);
 		return editorconfig.parse(fileName)
-			.then(async (config: editorconfig.knownProps) => {
+			.then(async (config: editorconfig.KnownProps) => {
 				if (config.indent_size === 'tab') {
 					config.indent_size = config.tab_width;
 				}
