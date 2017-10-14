@@ -1,3 +1,6 @@
+## 0.11.0
+- Support `unset` value.
+
 ## 0.10.1
 - Rollback [`#166`](https://github.com/editorconfig/editorconfig-vscode/pull/166) until we can ensure final newlines are not removed by default.
 
