@@ -1,9 +1,9 @@
-import * as editorconfig from 'editorconfig';
+import { KnownProps } from 'editorconfig';
 import {
 	TextDocument
 } from 'vscode';
 
 export interface EditorConfigProvider {
-	getSettingsForDocument(document: TextDocument): editorconfig.KnownProps;
+	getSettingsForDocument(document: TextDocument): KnownProps;
 	getDefaultSettings();
 }

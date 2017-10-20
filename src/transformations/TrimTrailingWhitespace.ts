@@ -1,4 +1,4 @@
-import * as editorconfig from 'editorconfig';
+import { KnownProps } from 'editorconfig';
 import {
 	commands,
 	workspace,
@@ -14,7 +14,7 @@ import PreSaveTransformation from './PreSaveTransformation';
 
 class TrimTrailingWhitespace extends PreSaveTransformation {
 	transform(
-		editorconfigProperties: editorconfig.KnownProps,
+		editorconfigProperties: KnownProps,
 		doc: TextDocument
 	) {
 		const editorTrimsWhitespace = workspace

@@ -1,5 +1,5 @@
 import * as get from 'lodash.get';
-import * as editorconfig from 'editorconfig';
+import { KnownProps } from 'editorconfig';
 import {
 	window,
 	TextDocument,
@@ -11,7 +11,7 @@ import {
  * Convert .editorconfig values to vscode editor options
  */
 export function fromEditorConfig(
-	config: editorconfig.KnownProps,
+	config: KnownProps,
 	defaults: TextEditorOptions
 ): TextEditorOptions {
 	const resolved: TextEditorOptions = {
@@ -35,7 +35,7 @@ export function fromEditorConfig(
  * Convert vscode editor options to .editorconfig values
  */
 export function toEditorConfig(options: TextEditorOptions) {
-	const result: editorconfig.KnownProps = {};
+	const result: KnownProps = {};
 
 	switch (options.insertSpaces) {
 		case true:
