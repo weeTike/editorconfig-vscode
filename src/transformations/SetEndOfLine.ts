@@ -1,4 +1,4 @@
-import * as editorconfig from 'editorconfig';
+import { KnownProps } from 'editorconfig';
 import {
 	EndOfLine,
 	TextEdit
@@ -14,7 +14,7 @@ class SetEndOfLine extends PreSaveTransformation {
 	};
 
 	transform(
-		editorconfigProperties: editorconfig.KnownProps
+		editorconfigProperties: KnownProps
 	) {
 		const eolKey = (editorconfigProperties.end_of_line || '').toUpperCase();
 		const eol = this.eolMap[eolKey];

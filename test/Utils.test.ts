@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import * as editorconfig from 'editorconfig';
+import { KnownProps } from 'editorconfig';
 import * as Utils from '../src/Utils';
 
 suite('EditorConfig extension', () => {
@@ -178,7 +178,7 @@ suite('EditorConfig extension', () => {
 		].forEach(scenario => {
 			assert.deepEqual(
 				Utils.fromEditorConfig(
-					scenario.config as editorconfig.KnownProps,
+					scenario.config as KnownProps,
 					scenario.defaults
 				),
 				scenario.expected

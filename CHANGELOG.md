@@ -1,3 +1,6 @@
+## 0.11.1
+- Update EditorConfig dependency.
+
 ## 0.11.0
 - Support `unset` value.
 

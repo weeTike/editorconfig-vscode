@@ -1,9 +1,9 @@
-import * as editorconfig from 'editorconfig';
+import { KnownProps } from 'editorconfig';
 import { TextDocument, TextEdit } from 'vscode';
 
 abstract class PreSaveTransformation {
 	abstract transform(
-		editorconfig: editorconfig.KnownProps,
+		editorconfig: KnownProps,
 		doc?: TextDocument
 	): {
 		edits: TextEdit[] | Error;

@@ -3,7 +3,7 @@
   "displayName": "EditorConfig for VS Code",
   "description": "EditorConfig Support for Visual Studio Code",
   "publisher": "EditorConfig",
-  "version": "0.11.0",
+  "version": "0.11.1",
   "icon": "EditorConfig_icon.png",
   "engines": {
     "vscode": "^1.11.0"
@@ -38,7 +38,7 @@
     ]
   },
   "dependencies": {
-    "editorconfig": "^0.14.2",
+    "editorconfig": "^0.15.0",
     "lodash.compact": "^3.0.1",
     "lodash.get": "^4.4.2"
   },

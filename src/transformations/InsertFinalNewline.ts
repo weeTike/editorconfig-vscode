@@ -1,5 +1,5 @@
 import * as get from 'lodash.get';
-import * as editorconfig from 'editorconfig';
+import { KnownProps } from 'editorconfig';
 import {
 	TextDocument,
 	Position,
@@ -17,7 +17,7 @@ export default class InsertFinalNewline extends PreSaveTransformation {
 	};
 
 	transform(
-		editorconfigProperties: editorconfig.KnownProps,
+		editorconfigProperties: KnownProps,
 		doc: TextDocument
 	) {
 		const lineCount = doc.lineCount;
