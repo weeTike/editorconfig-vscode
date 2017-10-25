@@ -10,7 +10,8 @@ import {
 	TextDocument,
 	TextEditor,
 	TextEditorOptions,
-	TextEdit
+	TextEdit,
+	TextDocumentSaveReason
 } from 'vscode';
 import languageExtensionMap from './languageExtensionMap';
 import { fromEditorConfig } from './Utils';
@@ -67,7 +68,8 @@ class DocumentWatcher implements EditorConfigProvider {
 				selections = window.activeTextEditor.selections;
 			}
 			const transformations = this.calculatePreSaveTransformations(
-				e.document
+				e.document,
+				e.reason
 			);
 			e.waitUntil(transformations);
 			if (selections) {
@@ -188,7 +190,8 @@ class DocumentWatcher implements EditorConfigProvider {
 	}
 
 	private async calculatePreSaveTransformations(
-		doc: TextDocument
+		doc: TextDocument,
+		reason: TextDocumentSaveReason
 	): Promise<TextEdit[]> {
 		const editorconfigSettings = this.getSettingsForDocument(doc);
 		const relativePath = workspace.asRelativePath(doc.fileName);
@@ -203,7 +206,8 @@ class DocumentWatcher implements EditorConfigProvider {
 				transformer => {
 					const { edits, message } = transformer.transform(
 						editorconfigSettings,
-						doc
+						doc,
+						reason
 					);
 					if (edits instanceof Error) {
 						this.log(`${relativePath}: ${edits.message}`);
