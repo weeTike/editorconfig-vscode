@@ -6,6 +6,8 @@
 [chat-img]: https://img.shields.io/badge/Gitter-Join_the_EditorConfig_VSCode_chat-brightgreen.svg
 [chat]: https://gitter.im/editorconfig/editorconfig-vscode
 
+This plugin [attempts](#known-issues) to override user/workspace settings with settings found in `.editorconfig` files. No additional or vscode-specific files are required. As with any EditorConfig plugin, if `root=true` is not specified, EditorConfig [will continue to look](http://editorconfig.org/#file-location) for an `.editorconfig` file outside of the project.
+
 ### This repository is specific to the [EditorConfig Extension for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig). Internally, it uses the [`editorconfig` npm package](https://www.npmjs.com/package/editorconfig), which is one of a few [EditorConfig](http://editorconfig.org) cores available.
 
 See also:
@@ -35,6 +37,10 @@ ext install EditorConfig
 ## On the backlog
 
 * `charset`
+
+## Known Issues
+
+* [`trim_trailing_whitespace = false` is not applied when user/workspace setting of `files.trimTrailingWhitespace` is set to `true`.](https://github.com/editorconfig/editorconfig-vscode/issues/153) 
 
 [Visual Studio Code]: https://code.visualstudio.com/
 [EditorConfig]: http://editorconfig.org/
