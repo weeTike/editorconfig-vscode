@@ -2,22 +2,16 @@ import * as fs from 'fs';
 import * as path from 'path';
 import {
 	workspace,
-	window
+	window,
+	Uri
 } from 'vscode';
 
 /**
  * Generate a .editorconfig file in the root of the workspace based on the
  * current vscode settings.
  */
-export function generateEditorConfig() {
-	if (!workspace.rootPath) {
-		window.showInformationMessage(
-			'Please open a folder before generating an .editorconfig file'
-		);
-		return;
-	}
-
-	const editorConfigFile = path.join(workspace.rootPath, '.editorconfig');
+export function generateEditorConfig(uri: Uri) {
+	const editorConfigFile = path.join(uri.fsPath, '.editorconfig');
 
 	fs.stat(editorConfigFile, (err, stats) => {
 
@@ -32,14 +26,14 @@ export function generateEditorConfig() {
 
 		if (stats.isFile()) {
 			window.showErrorMessage(
-				'A .editorconfig file already exists in your workspace.'
+				'An .editorconfig file already exists in this workspace.'
 			);
 		}
 	});
 
 	function writeFile() {
-		const editor = workspace.getConfiguration('editor');
-		const files = workspace.getConfiguration('files');
+		const editor = workspace.getConfiguration('editor', uri);
+		const files = workspace.getConfiguration('files', uri);
 
 		const settingsLines = ['root = true', '', '[*]'];
 		function addSetting(key: string, value?: string | number | boolean): void {

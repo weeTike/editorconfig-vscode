@@ -1,3 +1,6 @@
+## 0.12.0
+- Support multi-root workspaces [`#174`](https://github.com/editorconfig/editorconfig-vscode/issues/174).
+
 ## 0.11.1
 - Update EditorConfig dependency.
 
