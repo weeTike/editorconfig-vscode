@@ -103,7 +103,7 @@ class DocumentWatcher implements EditorConfigProvider {
 		const ext = languageExtensionMap[doc.languageId] || doc.languageId;
 		return path.join(
 			...compact([
-				workspace.rootPath,
+				workspace.getWorkspaceFolder(doc.uri),
 				`${doc.fileName}.${ext}`
 			])
 		);
@@ -126,7 +126,7 @@ class DocumentWatcher implements EditorConfigProvider {
 			return;
 		}
 		const fileName = this.getFileName(doc);
-		const relativePath = workspace.asRelativePath(fileName);
+		const relativePath = workspace.asRelativePath(fileName, true);
 
 		if (this.docToConfigMap[fileName]) {
 			this.log(`${relativePath}: Applying configuration map...`);
@@ -156,7 +156,7 @@ class DocumentWatcher implements EditorConfigProvider {
 		}
 
 		const doc = editor.document;
-		const relativePath = workspace.asRelativePath(doc.fileName);
+		const relativePath = workspace.asRelativePath(doc.fileName, true);
 		const editorconfigSettings = this.getSettingsForDocument(doc);
 
 		if (!editorconfigSettings) {
@@ -176,7 +176,7 @@ class DocumentWatcher implements EditorConfigProvider {
 	}
 
 	private onConfigChanged() {
-		const workspaceConfig = workspace.getConfiguration('editor');
+		const workspaceConfig = workspace.getConfiguration('editor', null);
 		const detectIndentation = workspaceConfig.get<boolean>('detectIndentation');
 
 		this.defaults = (detectIndentation) ? {} : {

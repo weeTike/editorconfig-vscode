@@ -37,7 +37,7 @@ export function activate(ctx: ExtensionContext): void {
 
 	// register a command handler to generate a .editorconfig file
 	commands.registerCommand(
-		'vscode.generateeditorconfig',
+		'EditorConfig.generate',
 		generateEditorConfig
 	);
 }

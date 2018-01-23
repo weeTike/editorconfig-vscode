@@ -6,12 +6,17 @@
   "version": "0.11.1",
   "icon": "EditorConfig_icon.png",
   "engines": {
-    "vscode": "^1.11.0"
+    "vscode": "^1.19.2"
   },
   "author": "EditorConfig Team",
   "license": "MIT",
   "categories": [
     "Other"
+  ],
+  "keywords": [
+    "editor",
+    "config",
+    "multi-root ready"
   ],
   "homepage": "https://github.com/editorconfig/editorconfig-vscode/blob/master/README.md",
   "repository": {
@@ -32,10 +37,25 @@
   "contributes": {
     "commands": [
       {
-        "command": "vscode.generateeditorconfig",
-        "title": "EditorConfig: Generate"
+        "command": "EditorConfig.generate",
+        "title": "Generate .editorconfig"
       }
-    ]
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "EditorConfig.generate",
+          "when": "explorerResourceIsFolder"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "EditorConfig.generate",
+          "when": "explorerResourceIsFolder",
+          "group": "EditorConfig@1"
+        }
+      ]
+    }
   },
   "dependencies": {
     "editorconfig": "^0.15.0",
@@ -43,13 +63,13 @@
     "lodash.get": "^4.4.2"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.77",
-    "@types/mocha": "^2.2.43",
-    "@types/node": "^8.0.34",
+    "@types/lodash": "^4.14.93",
+    "@types/mocha": "^2.2.46",
+    "@types/node": "^9.3.0",
     "rimraf": "^2.6.2",
-    "tslint": "^5.7.0",
-    "typescript": "^2.5.3",
-    "vscode": "^1.1.6",
+    "tslint": "^5.9.1",
+    "typescript": "^2.6.2",
+    "vscode": "^1.1.10",
     "vscode-test-utils": "0.0.9"
   },
   "scripts": {
