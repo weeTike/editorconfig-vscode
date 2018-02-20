@@ -11,7 +11,10 @@ import {
  * current vscode settings.
  */
 export function generateEditorConfig(uri: Uri) {
-	const editorConfigFile = path.join(uri.fsPath, '.editorconfig');
+	// the uri can be null - in this case try to fallback to the
+	const lookupPath: string = (uri !== undefined) ?
+		uri.fsPath : workspace.workspaceFolders[0].uri.fsPath;
+	const editorConfigFile = path.join(lookupPath, '.editorconfig');
 
 	fs.stat(editorConfigFile, (err, stats) => {
 
