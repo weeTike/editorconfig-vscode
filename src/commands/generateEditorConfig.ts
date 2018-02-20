@@ -1,3 +1,4 @@
+import * as get from 'lodash.get';
 import * as fs from 'fs';
 import * as path from 'path';
 import {
@@ -11,9 +12,11 @@ import {
  * current vscode settings.
  */
 export function generateEditorConfig(uri: Uri) {
-	// the uri can be null - in this case try to fallback to the
-	const lookupPath: string = (uri !== undefined) ?
-		uri.fsPath : workspace.workspaceFolders[0].uri.fsPath;
+	const lookupPath = get(
+		uri,
+		'fsPath',
+		get(workspace, 'workspaceFolders[0].uri.fsPath', '.'),
+	);
 	const editorConfigFile = path.join(lookupPath, '.editorconfig');
 
 	fs.stat(editorConfigFile, (err, stats) => {

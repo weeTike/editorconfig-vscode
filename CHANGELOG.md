@@ -1,3 +1,6 @@
+## 0.12.1
+- Provide fallback for workspace root directory when creating config file [`#188`](https://github.com/editorconfig/editorconfig-vscode/pull/188).
+
 ## 0.12.0
 - Support multi-root workspaces [`#174`](https://github.com/editorconfig/editorconfig-vscode/issues/174).
 
