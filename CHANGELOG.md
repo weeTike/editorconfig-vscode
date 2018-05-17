@@ -1,3 +1,6 @@
+## 0.12.2
+- Fix multi-root warning [`#192`](https://github.com/editorconfig/editorconfig-vscode/issues/192).
+
 ## 0.12.1
 - Provide fallback for workspace root directory when creating config file [`#188`](https://github.com/editorconfig/editorconfig-vscode/pull/188).
 

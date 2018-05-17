@@ -20,7 +20,7 @@ class TrimTrailingWhitespace extends PreSaveTransformation {
 		reason: TextDocumentSaveReason
 	) {
 		const editorTrimsWhitespace = workspace
-			.getConfiguration('files')
+			.getConfiguration('files', doc.uri)
 			.get('trimTrailingWhitespace', false);
 
 		if (editorTrimsWhitespace) {
