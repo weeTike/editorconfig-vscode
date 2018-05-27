@@ -53,7 +53,7 @@ export function generateEditorConfig(uri: Uri) {
 		addSetting('indent_style',
 			insertSpaces ? 'space' : 'tab');
 
-		addSetting(insertSpaces ? 'indent_size' : 'tab_size',
+		addSetting('indent_size',
 			editor.get<number>('tabSize'));
 
 		const eolMap = {
