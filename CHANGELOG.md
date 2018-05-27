@@ -1,3 +1,6 @@
+## 0.12.3
+- Fix "Generate .editorconfig" to specify `indent_size` instead of (invalid) `tab_size` [`#195`](https://github.com/editorconfig/editorconfig-vscode/issues/195).
+
 ## 0.12.2
 - Fix multi-root warning [`#192`](https://github.com/editorconfig/editorconfig-vscode/issues/192).
 
