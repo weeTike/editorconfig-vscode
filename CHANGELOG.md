@@ -1,3 +1,6 @@
+## 0.12.4
+- Use HTTPS links to EditorConfig.org [`#197`](https://github.com/editorconfig/editorconfig-vscode/pull/197).
+
 ## 0.12.3
 - Fix "Generate .editorconfig" to specify `indent_size` instead of (invalid) `tab_size` [`#195`](https://github.com/editorconfig/editorconfig-vscode/issues/195).
 
