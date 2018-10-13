@@ -197,6 +197,82 @@ suite('EditorConfig extension', () => {
 			`editor has insertSpaces: ${options.insertSpaces}`
 		);
 	});
+
+	test('detect indentation (space, unset tab_width=8)', async () => {
+		const options = await getOptionsForFixture([
+			'detect-indentation',
+			'tab_width',
+			'indent-style-space'
+		]);
+		const expectedTabSize = 2;
+		assert.strictEqual(
+			options.tabSize,
+			expectedTabSize,
+			`editor has a tabSize of ${options.tabSize} instead of ${expectedTabSize}`
+		);
+		assert.strictEqual(
+			options.insertSpaces,
+			true,
+			`editor has insertSpaces: ${options.insertSpaces}`
+		);
+	});
+
+	test('detect indentation (tab, unset tab_width=4)', async () => {
+		const options = await getOptionsForFixture([
+			'detect-indentation',
+			'tab_width',
+			'indent-style-tab'
+		]);
+		const expectedTabSize = 4;
+		assert.strictEqual(
+			options.tabSize,
+			expectedTabSize,
+			`editor has a tabSize of ${options.tabSize} instead of ${expectedTabSize}`
+		);
+		assert.strictEqual(
+			options.insertSpaces,
+			false,
+			`editor has insertSpaces: ${options.insertSpaces}`
+		);
+	});
+
+	test('detect indentation (space, unset)', async () => {
+		const options = await getOptionsForFixture([
+			'detect-indentation',
+			'unset',
+			'indent-style-space'
+		]);
+		const expectedTabSize = 2;
+		assert.strictEqual(
+			options.tabSize,
+			expectedTabSize,
+			`editor has a tabSize of ${options.tabSize} instead of ${expectedTabSize}`
+		);
+		assert.strictEqual(
+			options.insertSpaces,
+			true,
+			`editor has insertSpaces: ${options.insertSpaces}`
+		);
+	});
+
+	test('detect indentation (tab, unset)', async () => {
+		const options = await getOptionsForFixture([
+			'detect-indentation',
+			'unset',
+			'indent-style-tab'
+		]);
+		const expectedTabSize = 4;
+		assert.strictEqual(
+			options.tabSize,
+			expectedTabSize,
+			`editor has a tabSize of ${options.tabSize} instead of ${expectedTabSize}`
+		);
+		assert.strictEqual(
+			options.insertSpaces,
+			false,
+			`editor has insertSpaces: ${options.insertSpaces}`
+		);
+	});
 });
 
 function withSetting(
