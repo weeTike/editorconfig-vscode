@@ -160,10 +160,11 @@ suite('EditorConfig extension', () => {
 			'editor fails to preserve CRLF line endings on save');
 	});
 
-	test('detect indentation', async () => {
+	test('detect indentation (space, empty root)', async () => {
 		const options = await getOptionsForFixture([
 			'detect-indentation',
-			'indent-size-2'
+			'root',
+			'indent-style-space'
 		]);
 		const expectedTabSize = 2;
 		assert.strictEqual(
@@ -174,6 +175,25 @@ suite('EditorConfig extension', () => {
 		assert.strictEqual(
 			options.insertSpaces,
 			true,
+			`editor has insertSpaces: ${options.insertSpaces}`
+		);
+	});
+
+	test('detect indentation (tab, empty root)', async () => {
+		const options = await getOptionsForFixture([
+			'detect-indentation',
+			'root',
+			'indent-style-tab'
+		]);
+		const expectedTabSize = 4;
+		assert.strictEqual(
+			options.tabSize,
+			expectedTabSize,
+			`editor has a tabSize of ${options.tabSize} instead of ${expectedTabSize}`
+		);
+		assert.strictEqual(
+			options.insertSpaces,
+			false,
 			`editor has insertSpaces: ${options.insertSpaces}`
 		);
 	});
