@@ -1,3 +1,6 @@
+## 0.12.5
+- Update dependencies.
+
 ## 0.12.4
 - Use HTTPS links to EditorConfig.org [`#197`](https://github.com/editorconfig/editorconfig-vscode/pull/197).
 
