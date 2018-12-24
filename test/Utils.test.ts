@@ -58,7 +58,6 @@ suite('EditorConfig extension', () => {
 					tabSize: 4
 				},
 				expected: {
-					insertSpaces: false,
 					tabSize: 5
 				}
 			},
@@ -71,7 +70,6 @@ suite('EditorConfig extension', () => {
 					tabSize: 4
 				},
 				expected: {
-					insertSpaces: false,
 					tabSize: 5
 				}
 			},
@@ -84,7 +82,6 @@ suite('EditorConfig extension', () => {
 					tabSize: 4
 				},
 				expected: {
-					insertSpaces: true,
 					tabSize: 5
 				}
 			},
@@ -97,7 +94,6 @@ suite('EditorConfig extension', () => {
 					tabSize: 4
 				},
 				expected: {
-					insertSpaces: true,
 					tabSize: 5
 				}
 			},
@@ -148,7 +144,6 @@ suite('EditorConfig extension', () => {
 					tabSize: 5
 				},
 				expected: {
-					insertSpaces: false,
 					tabSize: 5
 				}
 			},
@@ -159,7 +154,6 @@ suite('EditorConfig extension', () => {
 					tabSize: 4
 				},
 				expected: {
-					insertSpaces: true,
 					tabSize: 4
 				}
 			},
