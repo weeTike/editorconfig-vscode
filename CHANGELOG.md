@@ -1,3 +1,6 @@
+## 0.12.6
+- Fix support for `unset` by not overriding built-in "detect indentation" functionality [`#201`](https://github.com/editorconfig/editorconfig-vscode/pull/201). Thanks [`@slartibardfast`](https://github.com/slartibardfast)!
+
 ## 0.12.5
 - Update dependencies.
 
