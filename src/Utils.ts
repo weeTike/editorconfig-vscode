@@ -24,10 +24,15 @@ export function fromEditorConfig(
 		resolved.tabSize = config.tab_width;
 	}
 	return {
-		insertSpaces: config.indent_style
-			? config.indent_style !== 'tab'
-			: defaults.insertSpaces,
-		tabSize: get(resolved, 'tabSize', defaults.tabSize)
+		...(config.indent_style === 'tab'
+			|| config.indent_size === 'tab'
+			|| config.indent_style === 'space'
+		) ? {
+			insertSpaces: config.indent_style === 'space'
+		} : {},
+		tabSize: resolved.tabSize >= 0
+			? resolved.tabSize
+			: defaults.tabSize
 	};
 }
 
