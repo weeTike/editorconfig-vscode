@@ -74,8 +74,12 @@ export function generateEditorConfig(uri: Uri) {
 		addSetting('trim_trailing_whitespace',
 			files.get<boolean>('trimTrailingWhitespace'));
 
-		addSetting('insert_final_newline',
-			files.get<boolean>('insertFinalNewline'));
+		const insertFinalNewline = files.get<boolean>('insertFinalNewline');
+		addSetting('insert_final_newline', insertFinalNewline);
+
+		if (insertFinalNewline) {
+			settingsLines.push('');
+		}
 
 		fs.writeFile(editorConfigFile, settingsLines.join('\n'), err => {
 			if (err) {
