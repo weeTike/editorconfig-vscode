@@ -4,6 +4,6 @@ import {
 } from 'vscode';
 
 export interface EditorConfigProvider {
-	getSettingsForDocument(document: TextDocument): KnownProps;
+	getSettingsForDocument(document: TextDocument): Promise<KnownProps>;
 	getDefaultSettings();
 }

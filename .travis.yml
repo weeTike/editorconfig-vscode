@@ -7,9 +7,9 @@ os:
   - linux
 
 node_js:
-  - 'stable'
+  - 'lts/*'
+  - '10'
   - '8'
-  - '6'
 
 before_install:
   - if [ $TRAVIS_OS_NAME == "linux" ]; then
