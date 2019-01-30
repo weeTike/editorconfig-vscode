@@ -8,7 +8,6 @@ import {
 	Disposable,
 	Selection,
 	TextDocument,
-	TextEditor,
 	TextEditorOptions,
 	TextEdit,
 	TextDocumentSaveReason
@@ -25,9 +24,8 @@ import {
 	EditorConfigProvider
 } from './interfaces/editorConfigProvider';
 
-class DocumentWatcher implements EditorConfigProvider {
+export default class DocumentWatcher implements EditorConfigProvider {
 
-	private docToConfigMap: { [fileName: string]: editorconfig.KnownProps };
 	private disposable: Disposable;
 	private defaults: TextEditorOptions;
 	private preSaveTransformations: PreSaveTransformation[] = [
@@ -35,6 +33,7 @@ class DocumentWatcher implements EditorConfigProvider {
 		new TrimTrailingWhitespace(),
 		new InsertFinalNewline()
 	];
+	private doc: TextDocument;
 
 	constructor(
 		private outputChannel = window.createOutputChannel('EditorConfig')
@@ -45,7 +44,13 @@ class DocumentWatcher implements EditorConfigProvider {
 
 		subscriptions.push(window.onDidChangeActiveTextEditor(editor => {
 			if (editor && editor.document) {
-				this.onDidOpenDocument(editor.document);
+				this.resolveConfig(this.doc = editor.document);
+			}
+		}));
+
+		subscriptions.push(window.onDidChangeWindowState(state => {
+			if (state.focused) {
+				this.resolveConfig(this.doc);
 			}
 		}));
 
@@ -53,10 +58,10 @@ class DocumentWatcher implements EditorConfigProvider {
 			this.onConfigChanged.bind(this)
 		));
 
-		subscriptions.push(workspace.onDidSaveTextDocument(async doc => {
+		subscriptions.push(workspace.onDidSaveTextDocument(doc => {
 			if (path.basename(doc.fileName) === '.editorconfig') {
 				this.log('.editorconfig file saved.');
-				await this.rebuildConfigMap();
+				this.onConfigChanged();
 			}
 		}));
 
@@ -73,14 +78,12 @@ class DocumentWatcher implements EditorConfigProvider {
 			);
 			e.waitUntil(transformations);
 			if (selections) {
-				transformations.then(() => {
-					activeEditor.selections = selections;
-				});
+				await transformations;
+				activeEditor.selections = selections;
 			}
 		}));
 
 		this.disposable = Disposable.from.apply(this, subscriptions);
-		this.rebuildConfigMap();
 		this.onConfigChanged();
 	}
 
@@ -92,8 +95,19 @@ class DocumentWatcher implements EditorConfigProvider {
 		this.disposable.dispose();
 	}
 
-	public getSettingsForDocument(doc: TextDocument) {
-		return this.docToConfigMap[this.getFileName(doc)];
+	public async getSettingsForDocument(doc: TextDocument) {
+		if (doc.languageId === 'Log') {
+			return {};
+		}
+		const fileName = this.getFileName(doc);
+		const relativePath = workspace.asRelativePath(fileName, true);
+
+		this.log(`${relativePath}: Using EditorConfig core...`);
+		const config = await editorconfig.parse(fileName);
+		if (config.indent_size === 'tab') {
+			config.indent_size = config.tab_width;
+		}
+		return config;
 	}
 
 	private getFileName(doc: TextDocument) {
@@ -113,55 +127,19 @@ class DocumentWatcher implements EditorConfigProvider {
 		return this.defaults;
 	}
 
-	private async rebuildConfigMap() {
-		this.log('Rebuilding config map...');
-		this.docToConfigMap = {};
-		return await Promise.all(workspace.textDocuments.map(
-			doc => this.onDidOpenDocument(doc)
-		));
-	}
-
-	private async onDidOpenDocument(doc: TextDocument) {
-		if (doc.languageId === 'Log') {
-			return;
-		}
-		const fileName = this.getFileName(doc);
-		const relativePath = workspace.asRelativePath(fileName, true);
-
-		if (this.docToConfigMap[fileName]) {
-			this.log(`${relativePath}: Applying configuration map...`);
-			await this.applyEditorConfigToTextEditor(window.activeTextEditor);
-			return;
-		}
-
-		this.log(`${relativePath}: Using EditorConfig core...`);
-		return editorconfig.parse(fileName)
-			.then(async (config) => {
-				if (config.indent_size === 'tab') {
-					config.indent_size = config.tab_width;
-				}
-
-				this.docToConfigMap[fileName] = config;
-
-				await this.applyEditorConfigToTextEditor(window.activeTextEditor);
-			});
-	}
-
-	private async applyEditorConfigToTextEditor(
-		editor: TextEditor,
-	) {
+	private async resolveConfig(doc: TextDocument) {
+		const editor = window.activeTextEditor;
 		if (!editor) {
 			this.log('No more open editors.');
-			return Promise.resolve();
+			return;
 		}
 
-		const doc = editor.document;
 		const relativePath = workspace.asRelativePath(doc.fileName, true);
-		const editorconfigSettings = this.getSettingsForDocument(doc);
+		const editorconfigSettings = await this.getSettingsForDocument(doc);
 
 		if (!editorconfigSettings) {
 			this.log(`${relativePath}: No configuration.`);
-			return Promise.resolve();
+			return;
 		}
 
 		const newOptions = fromEditorConfig(
@@ -193,7 +171,7 @@ class DocumentWatcher implements EditorConfigProvider {
 		doc: TextDocument,
 		reason: TextDocumentSaveReason
 	): Promise<TextEdit[]> {
-		const editorconfigSettings = this.getSettingsForDocument(doc);
+		const editorconfigSettings = await this.getSettingsForDocument(doc);
 		const relativePath = workspace.asRelativePath(doc.fileName);
 
 		if (!editorconfigSettings) {
@@ -221,5 +199,3 @@ class DocumentWatcher implements EditorConfigProvider {
 		);
 	}
 }
-
-export default DocumentWatcher;
