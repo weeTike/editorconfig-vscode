@@ -1,3 +1,11 @@
+## 0.12.8
+- **Fix:** Prevent document watcher from trying to load a config for an undefined text document.
+- **Fix:** Generate config with a final newline if it's enabled.
+- Add missing changelog for v0.12.7.
+
+## 0.12.7
+- **Fix:** Respond to external `.editorconfig` edits.
+
 ## 0.12.6
 - Fix support for `unset` by not overriding built-in "detect indentation" functionality [`#201`](https://github.com/editorconfig/editorconfig-vscode/pull/201). Thanks [`@slartibardfast`](https://github.com/slartibardfast)!
 

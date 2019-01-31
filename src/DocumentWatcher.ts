@@ -49,7 +49,7 @@ export default class DocumentWatcher implements EditorConfigProvider {
 		}));
 
 		subscriptions.push(window.onDidChangeWindowState(state => {
-			if (state.focused) {
+			if (state.focused && this.doc) {
 				this.resolveConfig(this.doc);
 			}
 		}));
