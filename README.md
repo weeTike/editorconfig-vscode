@@ -30,17 +30,23 @@ ext install EditorConfig
 * `indent_style`
 * `indent_size`
 * `tab_width`
-* `end_of_line`
-* `insert_final_newline`
-* `trim_trailing_whitespace`
+* `end_of_line` (on save)
+* `insert_final_newline` (on save)
+* `trim_trailing_whitespace` (on save)
 
 ## On the backlog
 
 * `charset`
 
+## How it works
+
+This extension is activated whenever you open a new text editor, switch tabs into an existing one or focus into the editor you already have open. When activated, it uses [`editorconfig`](https://www.npmjs.com/package/editorconfig) to resolve the configuration for that particular file and applies any relevant editor settings.
+
+_Note: some settings can only be applied on file save, as indicated above._
+
 ## Known Issues
 
-* [`trim_trailing_whitespace = false` is not applied when user/workspace setting of `files.trimTrailingWhitespace` is set to `true`.](https://github.com/editorconfig/editorconfig-vscode/issues/153) 
+* [`trim_trailing_whitespace = false` is not applied when user/workspace setting of `files.trimTrailingWhitespace` is set to `true`.](https://github.com/editorconfig/editorconfig-vscode/issues/153)
 
 [Visual Studio Code]: https://code.visualstudio.com/
 [EditorConfig]: https://editorconfig.org/
