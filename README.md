@@ -44,6 +44,8 @@ This extension is activated whenever you open a new text editor, switch tabs int
 
 _Note: some settings can only be applied on file save, as indicated above._
 
+A new `.editorconfig` file can be created via the Explorer sidebar's context menu by right-clicking in the folder where you'd like it to be and selecting `Generate .editorconfig`.
+
 ## Known Issues
 
 * [`trim_trailing_whitespace = false` is not applied when user/workspace setting of `files.trimTrailingWhitespace` is set to `true`.](https://github.com/editorconfig/editorconfig-vscode/issues/153)
