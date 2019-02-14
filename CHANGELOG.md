@@ -1,3 +1,6 @@
+## 0.13.0
+- **New:** Provide APIs to [other extensions](https://code.visualstudio.com/api/references/vscode-api#extensions).
+
 ## 0.12.8
 - **Fix:** Prevent document watcher from trying to load a config for an undefined text document.
 - **Fix:** Generate config with a final newline if it's enabled.

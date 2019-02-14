@@ -7,11 +7,18 @@ import {
 import EditorConfigCompletionProvider from './EditorConfigCompletionProvider';
 import DocumentWatcher from './DocumentWatcher';
 import { generateEditorConfig } from './commands/generateEditorConfig';
+import {
+	applyTextEditorOptions,
+	fromEditorConfig,
+	resolveCoreConfig,
+	resolveTextEditorOptions,
+	toEditorConfig,
+} from './api';
 
 /**
  * Main entry
  */
-export function activate(ctx: ExtensionContext): void {
+export function activate(ctx: ExtensionContext) {
 	ctx.subscriptions.push(new DocumentWatcher());
 
 	// register .editorconfig file completion provider
@@ -41,4 +48,12 @@ export function activate(ctx: ExtensionContext): void {
 		'EditorConfig.generate',
 		generateEditorConfig
 	);
+
+	return {
+		applyTextEditorOptions,
+		fromEditorConfig,
+		resolveCoreConfig,
+		resolveTextEditorOptions,
+		toEditorConfig,
+	};
 }
