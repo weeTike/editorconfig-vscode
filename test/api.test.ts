@@ -1,11 +1,11 @@
 import * as assert from 'assert';
 import { KnownProps } from 'editorconfig';
-import * as Utils from '../src/Utils';
+import * as api from '../src/api';
 
 suite('EditorConfig extension', () => {
 
 	// Defines a Mocha unit test
-	test('Utils.fromEditorConfig', () => {
+	test('api.fromEditorConfig', () => {
 		[
 			{
 				config: {
@@ -171,7 +171,7 @@ suite('EditorConfig extension', () => {
 			}
 		].forEach(scenario => {
 			assert.deepEqual(
-				Utils.fromEditorConfig(
+				api.fromEditorConfig(
 					scenario.config as KnownProps,
 					scenario.defaults
 				),
@@ -180,7 +180,7 @@ suite('EditorConfig extension', () => {
 		});
 	});
 
-	test('Utils.toEditorConfig', () => {
+	test('api.toEditorConfig', () => {
 		[
 			{
 				options: {
@@ -234,7 +234,7 @@ suite('EditorConfig extension', () => {
 			}
 		].forEach(scenario => {
 			assert.deepEqual(
-				Utils.toEditorConfig(
+				api.toEditorConfig(
 					scenario.options
 				),
 				scenario.expected

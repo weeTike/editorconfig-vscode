@@ -1,5 +1,3 @@
-import * as editorconfig from 'editorconfig';
-import * as compact from 'lodash.compact';
 import * as get from 'lodash.get';
 import * as path from 'path';
 import {
@@ -12,19 +10,22 @@ import {
 	TextEdit,
 	TextDocumentSaveReason
 } from 'vscode';
-import languageExtensionMap from './languageExtensionMap';
-import { fromEditorConfig } from './Utils';
 import {
 	InsertFinalNewline,
 	PreSaveTransformation,
 	SetEndOfLine,
 	TrimTrailingWhitespace
 } from './transformations';
-import {
-	EditorConfigProvider
-} from './interfaces/editorConfigProvider';
 
-export default class DocumentWatcher implements EditorConfigProvider {
+import {
+	applyTextEditorOptions,
+	pickWorkspaceDefaults,
+	resolveCoreConfig,
+	resolveFile,
+	resolveTextEditorOptions,
+} from './api';
+
+export default class DocumentWatcher {
 
 	private disposable: Disposable;
 	private defaults: TextEditorOptions;
@@ -42,20 +43,37 @@ export default class DocumentWatcher implements EditorConfigProvider {
 
 		const subscriptions: Disposable[] = [];
 
-		subscriptions.push(window.onDidChangeActiveTextEditor(editor => {
+		subscriptions.push(window.onDidChangeActiveTextEditor(async editor => {
 			if (editor && editor.document) {
-				this.resolveConfig(this.doc = editor.document);
+				const newOptions = await resolveTextEditorOptions(
+					this.doc = editor.document,
+					{
+						defaults: this.defaults,
+						onEmptyConfig: this.onEmptyConfig,
+					},
+				);
+				applyTextEditorOptions(newOptions, {
+					onNoActiveTextEditor: this.onNoActiveTextEditor,
+					onSuccess: this.onSuccess,
+				});
 			}
 		}));
 
-		subscriptions.push(window.onDidChangeWindowState(state => {
+		subscriptions.push(window.onDidChangeWindowState(async state => {
 			if (state.focused && this.doc) {
-				this.resolveConfig(this.doc);
+				const newOptions = await resolveTextEditorOptions(this.doc, {
+					defaults: this.defaults,
+					onEmptyConfig: this.onEmptyConfig,
+				});
+				applyTextEditorOptions(newOptions, {
+					onNoActiveTextEditor: this.onNoActiveTextEditor,
+					onSuccess: this.onSuccess,
+				});
 			}
 		}));
 
 		subscriptions.push(workspace.onDidChangeConfiguration(
-			this.onConfigChanged.bind(this)
+			this.onConfigChanged,
 		));
 
 		subscriptions.push(workspace.onDidSaveTextDocument(doc => {
@@ -87,6 +105,23 @@ export default class DocumentWatcher implements EditorConfigProvider {
 		this.onConfigChanged();
 	}
 
+	onEmptyConfig = (relativePath: string) => {
+		this.log(`${relativePath}: No configuration.`);
+	}
+
+	onBeforeResolve = (relativePath: string) => {
+		this.log(`${relativePath}: Using EditorConfig core...`);
+	}
+
+	onNoActiveTextEditor = () => {
+		this.log('No more open editors.');
+	}
+
+	onSuccess = (newOptions: TextEditorOptions) => {
+		const { relativePath } = resolveFile(this.doc);
+		this.log(`${relativePath}: ${JSON.stringify(newOptions)}`);
+	}
+
 	private log(...messages: string[]) {
 		this.outputChannel.appendLine(messages.join(' '));
 	}
@@ -95,75 +130,10 @@ export default class DocumentWatcher implements EditorConfigProvider {
 		this.disposable.dispose();
 	}
 
-	public async getSettingsForDocument(doc: TextDocument) {
-		if (doc.languageId === 'Log') {
-			return {};
-		}
-		const fileName = this.getFileName(doc);
-		const relativePath = workspace.asRelativePath(fileName, true);
-
-		this.log(`${relativePath}: Using EditorConfig core...`);
-		const config = await editorconfig.parse(fileName);
-		if (config.indent_size === 'tab') {
-			config.indent_size = config.tab_width;
-		}
-		return config;
-	}
-
-	private getFileName(doc: TextDocument) {
-		if (!doc.isUntitled) {
-			return doc.fileName;
-		}
-		const ext = languageExtensionMap[doc.languageId] || doc.languageId;
-		return path.join(
-			...compact([
-				workspace.getWorkspaceFolder(doc.uri),
-				`${doc.fileName}.${ext}`
-			])
-		);
-	}
-
-	public getDefaultSettings() {
-		return this.defaults;
-	}
-
-	private async resolveConfig(doc: TextDocument) {
-		const editor = window.activeTextEditor;
-		if (!editor) {
-			this.log('No more open editors.');
-			return;
-		}
-
-		const relativePath = workspace.asRelativePath(doc.fileName, true);
-		const editorconfigSettings = await this.getSettingsForDocument(doc);
-
-		if (!editorconfigSettings) {
-			this.log(`${relativePath}: No configuration.`);
-			return;
-		}
-
-		const newOptions = fromEditorConfig(
-			editorconfigSettings,
-			this.getDefaultSettings()
-		);
-
-		// tslint:disable-next-line:no-any
-		editor.options = newOptions as any;
-
-		this.log(`${relativePath}: ${JSON.stringify(newOptions)}`);
-	}
-
-	private onConfigChanged() {
-		const workspaceConfig = workspace.getConfiguration('editor', null);
-		const detectIndentation = workspaceConfig.get<boolean>('detectIndentation');
-
-		this.defaults = (detectIndentation) ? {} : {
-			tabSize: workspaceConfig.get<string | number>('tabSize'),
-			insertSpaces: workspaceConfig.get<string | boolean>('insertSpaces')
-		};
+	onConfigChanged = () => {
 		this.log(
 			'Detected change in configuration:',
-			JSON.stringify(this.defaults)
+			JSON.stringify(this.defaults = pickWorkspaceDefaults())
 		);
 	}
 
@@ -171,7 +141,9 @@ export default class DocumentWatcher implements EditorConfigProvider {
 		doc: TextDocument,
 		reason: TextDocumentSaveReason
 	): Promise<TextEdit[]> {
-		const editorconfigSettings = await this.getSettingsForDocument(doc);
+		const editorconfigSettings = await resolveCoreConfig(doc, {
+			onBeforeResolve: this.onBeforeResolve,
+		});
 		const relativePath = workspace.asRelativePath(doc.fileName);
 
 		if (!editorconfigSettings) {
