@@ -1,5 +1,5 @@
-import * as get from 'lodash.get';
-import * as path from 'path';
+import * as get from 'lodash.get'
+import * as path from 'path'
 import {
 	window,
 	workspace,
@@ -8,14 +8,14 @@ import {
 	TextDocument,
 	TextEditorOptions,
 	TextEdit,
-	TextDocumentSaveReason
-} from 'vscode';
+	TextDocumentSaveReason,
+} from 'vscode'
 import {
 	InsertFinalNewline,
 	PreSaveTransformation,
 	SetEndOfLine,
-	TrimTrailingWhitespace
-} from './transformations';
+	TrimTrailingWhitespace,
+} from './transformations'
 
 import {
 	applyTextEditorOptions,
@@ -23,151 +23,155 @@ import {
 	resolveCoreConfig,
 	resolveFile,
 	resolveTextEditorOptions,
-} from './api';
+} from './api'
 
 export default class DocumentWatcher {
-
-	private disposable: Disposable;
-	private defaults: TextEditorOptions;
+	private disposable: Disposable
+	private defaults: TextEditorOptions
 	private preSaveTransformations: PreSaveTransformation[] = [
 		new SetEndOfLine(),
 		new TrimTrailingWhitespace(),
-		new InsertFinalNewline()
-	];
-	private doc: TextDocument;
+		new InsertFinalNewline(),
+	]
+	private doc: TextDocument
 
-	constructor(
-		private outputChannel = window.createOutputChannel('EditorConfig')
+	public constructor(
+		private outputChannel = window.createOutputChannel('EditorConfig'),
 	) {
-		this.log('Initializing document watcher...');
+		this.log('Initializing document watcher...')
 
-		const subscriptions: Disposable[] = [];
+		const subscriptions: Disposable[] = []
 
-		subscriptions.push(window.onDidChangeActiveTextEditor(async editor => {
-			if (editor && editor.document) {
-				const newOptions = await resolveTextEditorOptions(
-					this.doc = editor.document,
-					{
+		subscriptions.push(
+			window.onDidChangeActiveTextEditor(async editor => {
+				if (editor && editor.document) {
+					const newOptions = await resolveTextEditorOptions(
+						(this.doc = editor.document),
+						{
+							defaults: this.defaults,
+							onEmptyConfig: this.onEmptyConfig,
+						},
+					)
+					applyTextEditorOptions(newOptions, {
+						onNoActiveTextEditor: this.onNoActiveTextEditor,
+						onSuccess: this.onSuccess,
+					})
+				}
+			}),
+		)
+
+		subscriptions.push(
+			window.onDidChangeWindowState(async state => {
+				if (state.focused && this.doc) {
+					const newOptions = await resolveTextEditorOptions(this.doc, {
 						defaults: this.defaults,
 						onEmptyConfig: this.onEmptyConfig,
-					},
-				);
-				applyTextEditorOptions(newOptions, {
-					onNoActiveTextEditor: this.onNoActiveTextEditor,
-					onSuccess: this.onSuccess,
-				});
-			}
-		}));
+					})
+					applyTextEditorOptions(newOptions, {
+						onNoActiveTextEditor: this.onNoActiveTextEditor,
+						onSuccess: this.onSuccess,
+					})
+				}
+			}),
+		)
 
-		subscriptions.push(window.onDidChangeWindowState(async state => {
-			if (state.focused && this.doc) {
-				const newOptions = await resolveTextEditorOptions(this.doc, {
-					defaults: this.defaults,
-					onEmptyConfig: this.onEmptyConfig,
-				});
-				applyTextEditorOptions(newOptions, {
-					onNoActiveTextEditor: this.onNoActiveTextEditor,
-					onSuccess: this.onSuccess,
-				});
-			}
-		}));
+		subscriptions.push(workspace.onDidChangeConfiguration(this.onConfigChanged))
 
-		subscriptions.push(workspace.onDidChangeConfiguration(
-			this.onConfigChanged,
-		));
+		subscriptions.push(
+			workspace.onDidSaveTextDocument(doc => {
+				if (path.basename(doc.fileName) === '.editorconfig') {
+					this.log('.editorconfig file saved.')
+					this.onConfigChanged()
+				}
+			}),
+		)
 
-		subscriptions.push(workspace.onDidSaveTextDocument(doc => {
-			if (path.basename(doc.fileName) === '.editorconfig') {
-				this.log('.editorconfig file saved.');
-				this.onConfigChanged();
-			}
-		}));
+		subscriptions.push(
+			workspace.onWillSaveTextDocument(async e => {
+				let selections: Selection[]
+				const activeEditor = window.activeTextEditor
+				const activeDoc = get(activeEditor, 'document')
+				if (activeDoc && activeDoc === e.document) {
+					selections = window.activeTextEditor.selections
+				}
+				const transformations = this.calculatePreSaveTransformations(
+					e.document,
+					e.reason,
+				)
+				e.waitUntil(transformations)
+				if (selections) {
+					await transformations
+					activeEditor.selections = selections
+				}
+			}),
+		)
 
-		subscriptions.push(workspace.onWillSaveTextDocument(async e => {
-			let selections: Selection[];
-			const activeEditor = window.activeTextEditor;
-			const activeDoc = get(activeEditor, 'document');
-			if (activeDoc && activeDoc === e.document) {
-				selections = window.activeTextEditor.selections;
-			}
-			const transformations = this.calculatePreSaveTransformations(
-				e.document,
-				e.reason
-			);
-			e.waitUntil(transformations);
-			if (selections) {
-				await transformations;
-				activeEditor.selections = selections;
-			}
-		}));
-
-		this.disposable = Disposable.from.apply(this, subscriptions);
-		this.onConfigChanged();
+		this.disposable = Disposable.from.apply(this, subscriptions)
+		this.onConfigChanged()
 	}
 
-	onEmptyConfig = (relativePath: string) => {
-		this.log(`${relativePath}: No configuration.`);
+	public onEmptyConfig = (relativePath: string) => {
+		this.log(`${relativePath}: No configuration.`)
 	}
 
-	onBeforeResolve = (relativePath: string) => {
-		this.log(`${relativePath}: Using EditorConfig core...`);
+	public onBeforeResolve = (relativePath: string) => {
+		this.log(`${relativePath}: Using EditorConfig core...`)
 	}
 
-	onNoActiveTextEditor = () => {
-		this.log('No more open editors.');
+	public onNoActiveTextEditor = () => {
+		this.log('No more open editors.')
 	}
 
-	onSuccess = (newOptions: TextEditorOptions) => {
-		const { relativePath } = resolveFile(this.doc);
-		this.log(`${relativePath}: ${JSON.stringify(newOptions)}`);
+	public onSuccess = (newOptions: TextEditorOptions) => {
+		const { relativePath } = resolveFile(this.doc)
+		this.log(`${relativePath}: ${JSON.stringify(newOptions)}`)
 	}
 
 	private log(...messages: string[]) {
-		this.outputChannel.appendLine(messages.join(' '));
+		this.outputChannel.appendLine(messages.join(' '))
 	}
 
 	public dispose() {
-		this.disposable.dispose();
+		this.disposable.dispose()
 	}
 
-	onConfigChanged = () => {
+	public onConfigChanged = () => {
 		this.log(
 			'Detected change in configuration:',
-			JSON.stringify(this.defaults = pickWorkspaceDefaults())
-		);
+			JSON.stringify((this.defaults = pickWorkspaceDefaults())),
+		)
 	}
 
 	private async calculatePreSaveTransformations(
 		doc: TextDocument,
-		reason: TextDocumentSaveReason
+		reason: TextDocumentSaveReason,
 	): Promise<TextEdit[]> {
 		const editorconfigSettings = await resolveCoreConfig(doc, {
 			onBeforeResolve: this.onBeforeResolve,
-		});
-		const relativePath = workspace.asRelativePath(doc.fileName);
+		})
+		const relativePath = workspace.asRelativePath(doc.fileName)
 
 		if (!editorconfigSettings) {
-			this.log(`${relativePath}: No configuration found for pre-save.`);
-			return [];
+			this.log(`${relativePath}: No configuration found for pre-save.`)
+			return []
 		}
 
-		return Array.prototype.concat.call([],
-			...this.preSaveTransformations.map(
-				transformer => {
-					const { edits, message } = transformer.transform(
-						editorconfigSettings,
-						doc,
-						reason
-					);
-					if (edits instanceof Error) {
-						this.log(`${relativePath}: ${edits.message}`);
-					}
-					if (message) {
-						this.log(`${relativePath}: ${message}`);
-					}
-					return edits;
+		return Array.prototype.concat.call(
+			[],
+			...this.preSaveTransformations.map(transformer => {
+				const { edits, message } = transformer.transform(
+					editorconfigSettings,
+					doc,
+					reason,
+				)
+				if (edits instanceof Error) {
+					this.log(`${relativePath}: ${edits.message}`)
 				}
-			)
-		);
+				if (message) {
+					this.log(`${relativePath}: ${message}`)
+				}
+				return edits
+			}),
+		)
 	}
 }

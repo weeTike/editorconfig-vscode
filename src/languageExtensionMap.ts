@@ -7,5 +7,5 @@ export default {
 	ruby: 'rb',
 	typescript: 'ts',
 	typescriptreact: 'tsx',
-	yaml: 'yml'
-};
+	yaml: 'yml',
+}
