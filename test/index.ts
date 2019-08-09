@@ -1,8 +1,8 @@
-const testRunner = require('vscode/lib/testrunner');
+const testRunner = require('vscode/lib/testrunner')
 
 testRunner.configure({
 	ui: 'tdd',
-	useColors: true
-});
+	useColors: true,
+})
 
-module.exports = testRunner;
+module.exports = testRunner

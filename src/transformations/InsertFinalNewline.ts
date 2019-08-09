@@ -1,48 +1,39 @@
-import * as get from 'lodash.get';
-import { KnownProps } from 'editorconfig';
-import {
-	TextDocument,
-	Position,
-	TextEdit
-} from 'vscode';
+import * as get from 'lodash.get'
+import { KnownProps } from 'editorconfig'
+import { TextDocument, Position, TextEdit } from 'vscode'
 
-import PreSaveTransformation from './PreSaveTransformation';
+import PreSaveTransformation from './PreSaveTransformation'
 
 export default class InsertFinalNewline extends PreSaveTransformation {
-
 	private lineEndings = {
 		CR: '\r',
 		CRLF: '\r\n',
-		LF: '\n'
-	};
+		LF: '\n',
+	}
 
-	transform(
-		editorconfigProperties: KnownProps,
-		doc: TextDocument
-	) {
-		const lineCount = doc.lineCount;
-		const lastLine = doc.lineAt(lineCount - 1);
+	transform(editorconfigProperties: KnownProps, doc: TextDocument) {
+		const lineCount = doc.lineCount
+		const lastLine = doc.lineAt(lineCount - 1)
 
-		if (shouldIgnoreSetting(editorconfigProperties.insert_final_newline)
-			|| lineCount === 0
-			|| lastLine.isEmptyOrWhitespace) {
-			return { edits: [] };
+		if (
+			shouldIgnoreSetting(editorconfigProperties.insert_final_newline) ||
+			lineCount === 0 ||
+			lastLine.isEmptyOrWhitespace
+		) {
+			return { edits: [] }
 		}
 
-		const position = new Position(
-			lastLine.lineNumber,
-			lastLine.text.length
-		);
+		const position = new Position(lastLine.lineNumber, lastLine.text.length)
 
-		const eol = get(editorconfigProperties, 'end_of_line', 'lf').toUpperCase();
+		const eol = get(editorconfigProperties, 'end_of_line', 'lf').toUpperCase()
 
 		return {
-			edits: [ TextEdit.insert(position, this.lineEndings[eol]) ],
-			message: `insertFinalNewline(${eol})`
-		};
+			edits: [TextEdit.insert(position, this.lineEndings[eol])],
+			message: `insertFinalNewline(${eol})`,
+		}
 
 		function shouldIgnoreSetting(value) {
-			return !value || value === 'unset';
+			return !value || value === 'unset'
 		}
 	}
 }
