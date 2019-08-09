@@ -1,8 +1,6 @@
 import * as editorconfig from 'editorconfig'
-import compact = require('lodash.compact')
 import get = require('lodash.get')
-import * as path from 'path'
-import { window, workspace, TextDocument, TextEditorOptions } from 'vscode'
+import { TextDocument, TextEditorOptions, window, workspace } from 'vscode'
 
 import languageExtensionMap from './languageExtensionMap'
 
@@ -19,15 +17,20 @@ export async function resolveTextEditorOptions(
 	}: {
 		defaults?: TextEditorOptions
 		onBeforeResolve?: (relativePath: string) => void
-		onEmptyConfig?: (relativePath?: string) => void
+		onEmptyConfig?: (relativePath: string) => void
 	} = {},
 ) {
-	const editorconfigSettings = await resolveCoreConfig(doc, { onBeforeResolve })
+	const editorconfigSettings = await resolveCoreConfig(doc, {
+		onBeforeResolve,
+	})
 	if (editorconfigSettings) {
 		return fromEditorConfig(editorconfigSettings, defaults)
 	}
 	if (onEmptyConfig) {
-		onEmptyConfig(resolveFile(doc).relativePath)
+		const rp = resolveFile(doc).relativePath
+		if (rp) {
+			onEmptyConfig(rp)
+		}
 	}
 	return {}
 }
@@ -86,9 +89,8 @@ export function pickWorkspaceDefaults(): {
 		  }
 }
 
-export interface ResolvedCoreConfig extends editorconfig.KnownProps {
-	[rule: string]: string | number | boolean
-}
+export type ResolvedCoreConfig = editorconfig.KnownProps &
+	Record<string, string | number | boolean>
 
 /**
  * Resolves an EditorConfig configuration for the file related to a
@@ -106,7 +108,7 @@ export async function resolveCoreConfig(
 	if (!fileName) {
 		return {}
 	}
-	if (onBeforeResolve) {
+	if (onBeforeResolve && relativePath) {
 		onBeforeResolve(relativePath)
 	}
 	const config = await editorconfig.parse(fileName)
@@ -125,22 +127,26 @@ export function resolveFile(
 	if (doc.languageId === 'Log') {
 		return {}
 	}
-	const fileName = getFileName()
+	const file = getFile()
 	return {
-		fileName,
-		relativePath: workspace.asRelativePath(fileName, true),
+		fileName: file && file.toString(),
+		relativePath: file && workspace.asRelativePath(file, true),
 	}
 
-	function getFileName() {
+	function getFile() {
 		if (!doc.isUntitled) {
 			return doc.fileName
 		}
-		const ext = languageExtensionMap[doc.languageId] || doc.languageId
-		return path.join(
-			...compact([
-				workspace.getWorkspaceFolder(doc.uri).uri.fsPath,
-				`${doc.fileName}.${ext}`,
-			]),
+		const ext =
+			languageExtensionMap[
+				doc.languageId as keyof typeof languageExtensionMap
+			] || doc.languageId
+		const folder = workspace.getWorkspaceFolder(doc.uri)
+		return (
+			folder &&
+			folder.uri.with({
+				path: `${doc.fileName}.${ext}`,
+			})
 		)
 	}
 }
@@ -182,12 +188,16 @@ export function toEditorConfig(options: TextEditorOptions) {
 	switch (options.insertSpaces) {
 		case true:
 			result.indent_style = 'space'
-			result.indent_size = resolveTabSize(options.tabSize)
+			if (options.tabSize) {
+				result.indent_size = resolveTabSize(options.tabSize)
+			}
 			break
 		case false:
 		case 'auto':
 			result.indent_style = 'tab'
-			result.tab_width = resolveTabSize(options.tabSize)
+			if (options.tabSize) {
+				result.tab_width = resolveTabSize(options.tabSize)
+			}
 			break
 	}
 

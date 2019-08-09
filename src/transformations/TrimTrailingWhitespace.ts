@@ -1,14 +1,14 @@
 import { KnownProps } from 'editorconfig'
 import {
 	commands,
-	workspace,
-	TextDocument,
-	TextLine,
 	Position,
 	Range,
-	TextEdit,
-	window,
+	TextDocument,
 	TextDocumentSaveReason,
+	TextEdit,
+	TextLine,
+	window,
+	workspace,
 } from 'vscode'
 
 import PreSaveTransformation from './PreSaveTransformation'
@@ -40,7 +40,7 @@ class TrimTrailingWhitespace extends PreSaveTransformation {
 			return { edits: [] }
 		}
 
-		if (window.activeTextEditor.document === doc) {
+		if (window.activeTextEditor && window.activeTextEditor.document === doc) {
 			const trimReason =
 				reason !== TextDocumentSaveReason.Manual ? 'auto-save' : null
 			commands.executeCommand('editor.action.trimTrailingWhitespace', {
@@ -66,7 +66,9 @@ class TrimTrailingWhitespace extends PreSaveTransformation {
 			message: 'trimTrailingWhitespace()',
 		}
 
-		function shouldIgnoreSetting(value) {
+		function shouldIgnoreSetting(
+			value: typeof editorconfigProperties.trim_trailing_whitespace,
+		) {
 			return !value || value === 'unset'
 		}
 	}

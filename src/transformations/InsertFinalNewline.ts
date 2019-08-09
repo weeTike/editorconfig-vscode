@@ -1,15 +1,17 @@
-import get = require('lodash.get')
 import { KnownProps } from 'editorconfig'
-import { TextDocument, Position, TextEdit } from 'vscode'
+import get = require('lodash.get')
+import { Position, TextDocument, TextEdit } from 'vscode'
 
 import PreSaveTransformation from './PreSaveTransformation'
 
+const lineEndings = {
+	CR: '\r',
+	CRLF: '\r\n',
+	LF: '\n',
+}
+
 export default class InsertFinalNewline extends PreSaveTransformation {
-	private lineEndings = {
-		CR: '\r',
-		CRLF: '\r\n',
-		LF: '\n',
-	}
+	private lineEndings = lineEndings
 
 	public transform(editorconfigProperties: KnownProps, doc: TextDocument) {
 		const lineCount = doc.lineCount
@@ -28,11 +30,18 @@ export default class InsertFinalNewline extends PreSaveTransformation {
 		const eol = get(editorconfigProperties, 'end_of_line', 'lf').toUpperCase()
 
 		return {
-			edits: [TextEdit.insert(position, this.lineEndings[eol])],
+			edits: [
+				TextEdit.insert(
+					position,
+					this.lineEndings[eol as keyof typeof lineEndings],
+				),
+			],
 			message: `insertFinalNewline(${eol})`,
 		}
 
-		function shouldIgnoreSetting(value) {
+		function shouldIgnoreSetting(
+			value?: typeof editorconfigProperties.insert_final_newline,
+		) {
 			return !value || value === 'unset'
 		}
 	}
