@@ -1,14 +1,14 @@
 import get = require('lodash.get')
 import * as path from 'path'
 import {
-	window,
-	workspace,
 	Disposable,
 	Selection,
 	TextDocument,
-	TextEditorOptions,
-	TextEdit,
 	TextDocumentSaveReason,
+	TextEdit,
+	TextEditorOptions,
+	window,
+	workspace,
 } from 'vscode'
 import {
 	InsertFinalNewline,
@@ -27,13 +27,13 @@ import {
 
 export default class DocumentWatcher {
 	private disposable: Disposable
-	private defaults: TextEditorOptions
+	private defaults?: TextEditorOptions
 	private preSaveTransformations: PreSaveTransformation[] = [
 		new SetEndOfLine(),
 		new TrimTrailingWhitespace(),
 		new InsertFinalNewline(),
 	]
-	private doc: TextDocument
+	private doc?: TextDocument
 
 	public constructor(
 		private outputChannel = window.createOutputChannel('EditorConfig'),
@@ -88,20 +88,22 @@ export default class DocumentWatcher {
 
 		subscriptions.push(
 			workspace.onWillSaveTextDocument(async e => {
-				let selections: Selection[]
+				let selections: Selection[] = []
 				const activeEditor = window.activeTextEditor
 				const activeDoc = get(activeEditor, 'document')
-				if (activeDoc && activeDoc === e.document) {
-					selections = window.activeTextEditor.selections
+				if (activeDoc && activeDoc === e.document && activeEditor) {
+					selections = activeEditor.selections
 				}
 				const transformations = this.calculatePreSaveTransformations(
 					e.document,
 					e.reason,
 				)
 				e.waitUntil(transformations)
-				if (selections) {
+				if (selections.length) {
 					await transformations
-					activeEditor.selections = selections
+					if (activeEditor) {
+						activeEditor.selections = selections
+					}
 				}
 			}),
 		)
@@ -123,11 +125,15 @@ export default class DocumentWatcher {
 	}
 
 	public onSuccess = (newOptions: TextEditorOptions) => {
+		if (!this.doc) {
+			this.log(`[no file]: ${JSON.stringify(newOptions)}`)
+			return
+		}
 		const { relativePath } = resolveFile(this.doc)
 		this.log(`${relativePath}: ${JSON.stringify(newOptions)}`)
 	}
 
-	private log(...messages: string[]) {
+	public log(...messages: string[]) {
 		this.outputChannel.appendLine(messages.join(' '))
 	}
 

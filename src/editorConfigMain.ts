@@ -1,7 +1,4 @@
-import { ExtensionContext, DocumentSelector, commands, languages } from 'vscode'
-import EditorConfigCompletionProvider from './EditorConfigCompletionProvider'
-import DocumentWatcher from './DocumentWatcher'
-import { generateEditorConfig } from './commands/generateEditorConfig'
+import { commands, DocumentSelector, ExtensionContext, languages } from 'vscode'
 import {
 	applyTextEditorOptions,
 	fromEditorConfig,
@@ -9,6 +6,9 @@ import {
 	resolveTextEditorOptions,
 	toEditorConfig,
 } from './api'
+import { generateEditorConfig } from './commands/generateEditorConfig'
+import DocumentWatcher from './DocumentWatcher'
+import EditorConfigCompletionProvider from './EditorConfigCompletionProvider'
 
 /**
  * Main entry
@@ -30,7 +30,7 @@ export function activate(ctx: ExtensionContext) {
 	// register an internal command used to automatically display IntelliSense
 	// when editing a .editorconfig file
 	commands.registerCommand('editorconfig._triggerSuggestAfterDelay', () => {
-		setTimeout(function() {
+		setTimeout(() => {
 			commands.executeCommand('editor.action.triggerSuggest')
 		}, 100)
 	})

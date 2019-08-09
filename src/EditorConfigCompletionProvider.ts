@@ -1,8 +1,8 @@
 import {
 	Command,
-	CompletionItemProvider,
 	CompletionItem,
 	CompletionItemKind,
+	CompletionItemProvider,
 	Position,
 	TextDocument,
 } from 'vscode'
@@ -222,7 +222,8 @@ class EditorConfigCompletionProvider implements CompletionItemProvider {
 			const completionItem = new CompletionItem(value, CompletionItemKind.Value)
 
 			// sort predefined values to specific order
-			completionItem.sortText = valuesSortOrder[value] || '3' + value
+			completionItem.sortText =
+				valuesSortOrder[value as keyof typeof valuesSortOrder] || '3' + value
 			return completionItem
 		})
 	}

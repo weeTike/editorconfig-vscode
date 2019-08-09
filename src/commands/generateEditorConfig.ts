@@ -1,21 +1,21 @@
-import get = require('lodash.get')
-import * as fs from 'fs'
-import * as path from 'path'
-import { workspace, window, Uri } from 'vscode'
+import { FileType, Uri, window, workspace } from 'vscode'
 
 /**
  * Generate a .editorconfig file in the root of the workspace based on the
  * current vscode settings.
  */
-export function generateEditorConfig(uri: Uri) {
-	const lookupPath = get(
-		uri,
-		'fsPath',
-		get(workspace, 'workspaceFolders[0].uri.fsPath', '.'),
-	)
-	const editorConfigFile = path.join(lookupPath, '.editorconfig')
+export async function generateEditorConfig(uri: Uri) {
+	const editorConfigUri = uri.with({ path: '.editorconfig' })
 
-	fs.stat(editorConfigFile, (err, stats) => {
+	try {
+		const stats = await workspace.fs.stat(editorConfigUri)
+		if (stats.type === FileType.File) {
+			window.showErrorMessage(
+				'An .editorconfig file already exists in this workspace.',
+			)
+			return
+		}
+	} catch (err) {
 		if (err) {
 			if (err.code === 'ENOENT') {
 				writeFile()
@@ -24,15 +24,9 @@ export function generateEditorConfig(uri: Uri) {
 			}
 			return
 		}
+	}
 
-		if (stats.isFile()) {
-			window.showErrorMessage(
-				'An .editorconfig file already exists in this workspace.',
-			)
-		}
-	})
-
-	function writeFile() {
+	async function writeFile() {
 		const editor = workspace.getConfiguration('editor', uri)
 		const files = workspace.getConfiguration('files', uri)
 
@@ -53,7 +47,10 @@ export function generateEditorConfig(uri: Uri) {
 			'\r\n': 'crlf',
 			'\n': 'lf',
 		}
-		addSetting('end_of_line', eolMap[files.get<string>('eol')])
+		addSetting(
+			'end_of_line',
+			eolMap[files.get<string>('eol') as keyof typeof eolMap],
+		)
 
 		const encodingMap = {
 			iso88591: 'latin1',
@@ -62,7 +59,10 @@ export function generateEditorConfig(uri: Uri) {
 			utf16be: 'utf-16-be',
 			utf16le: 'utf-16-le',
 		}
-		addSetting('charset', encodingMap[files.get<string>('encoding')])
+		addSetting(
+			'charset',
+			encodingMap[files.get<string>('encoding') as keyof typeof encodingMap],
+		)
 
 		addSetting(
 			'trim_trailing_whitespace',
@@ -76,11 +76,16 @@ export function generateEditorConfig(uri: Uri) {
 			settingsLines.push('')
 		}
 
-		fs.writeFile(editorConfigFile, settingsLines.join('\n'), err => {
+		try {
+			await workspace.fs.writeFile(
+				editorConfigUri,
+				Buffer.from(settingsLines.join('\n')),
+			)
+		} catch (err) {
 			if (err) {
 				window.showErrorMessage(err.message)
 				return
 			}
-		})
+		}
 	}
 }

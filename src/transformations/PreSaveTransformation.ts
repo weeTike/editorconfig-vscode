@@ -1,8 +1,8 @@
 import { KnownProps } from 'editorconfig'
-import { TextDocument, TextEdit, TextDocumentSaveReason } from 'vscode'
+import { TextDocument, TextDocumentSaveReason, TextEdit } from 'vscode'
 
 abstract class PreSaveTransformation {
-	abstract transform(
+	public abstract transform(
 		editorconfig: KnownProps,
 		doc?: TextDocument,
 		reason?: TextDocumentSaveReason,

@@ -3,15 +3,17 @@ import { EndOfLine, TextEdit } from 'vscode'
 
 import PreSaveTransformation from './PreSaveTransformation'
 
+const eolMap = {
+	LF: EndOfLine.LF,
+	CRLF: EndOfLine.CRLF,
+}
+
 class SetEndOfLine extends PreSaveTransformation {
-	private eolMap = {
-		LF: EndOfLine.LF,
-		CRLF: EndOfLine.CRLF,
-	}
+	private eolMap = eolMap
 
 	public transform(editorconfigProperties: KnownProps) {
 		const eolKey = (editorconfigProperties.end_of_line || '').toUpperCase()
-		const eol = this.eolMap[eolKey]
+		const eol = this.eolMap[eolKey as keyof typeof eolMap]
 
 		return eol
 			? {
