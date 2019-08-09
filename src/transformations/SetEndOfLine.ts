@@ -9,7 +9,7 @@ class SetEndOfLine extends PreSaveTransformation {
 		CRLF: EndOfLine.CRLF,
 	}
 
-	transform(editorconfigProperties: KnownProps) {
+	public transform(editorconfigProperties: KnownProps) {
 		const eolKey = (editorconfigProperties.end_of_line || '').toUpperCase()
 		const eol = this.eolMap[eolKey]
 

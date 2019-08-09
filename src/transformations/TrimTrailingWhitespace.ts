@@ -14,7 +14,7 @@ import {
 import PreSaveTransformation from './PreSaveTransformation'
 
 class TrimTrailingWhitespace extends PreSaveTransformation {
-	transform(
+	public transform(
 		editorconfigProperties: KnownProps,
 		doc: TextDocument,
 		reason: TextDocumentSaveReason,

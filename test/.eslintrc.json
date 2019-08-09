@@ -1,0 +1,10 @@
+{
+  "env": {
+    "mocha": true
+  },
+  "rules": {
+    "no-async-promise-executor": "off",
+    "no-await-in-loop": "off",
+    "@typescript-eslint/no-non-null-assertion": "off"
+  }
+}

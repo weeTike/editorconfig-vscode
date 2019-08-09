@@ -11,7 +11,7 @@ export default class InsertFinalNewline extends PreSaveTransformation {
 		LF: '\n',
 	}
 
-	transform(editorconfigProperties: KnownProps, doc: TextDocument) {
+	public transform(editorconfigProperties: KnownProps, doc: TextDocument) {
 		const lineCount = doc.lineCount
 		const lastLine = doc.lineAt(lineCount - 1)
 

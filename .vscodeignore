@@ -7,8 +7,8 @@ test/**
 src/**
 **/*.map
 .editorconfig
+.eslint*
 .gitignore
 .travis.yml
 tsconfig.json
-tslint.json
 vsc-extension-quickstart.md
