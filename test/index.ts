@@ -1,4 +1,4 @@
-const testRunner = require('vscode/lib/testrunner')
+import testRunner = require('vscode/lib/testrunner')
 
 testRunner.configure({
 	ui: 'tdd',
