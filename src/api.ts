@@ -175,7 +175,7 @@ export function fromEditorConfig(
 					insertSpaces: config.indent_style === 'space',
 			  }
 			: {}),
-		tabSize: resolved.tabSize >= 0 ? resolved.tabSize : defaults.tabSize,
+		tabSize: resolved.tabSize || 0 >= 0 ? resolved.tabSize : defaults.tabSize,
 	}
 }
 

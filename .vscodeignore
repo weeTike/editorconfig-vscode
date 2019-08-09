@@ -1,13 +1,17 @@
-.github/**
+# defaults
 .vscode/**
 .vscode-test/**
-typings/**
 out/test/**
 src/**
+.gitignore
+vsc-extension-quickstart.md
+**/tsconfig.json
 **/*.map
+**/*.ts
+
+# additional
+.github/**
 .editorconfig
 .eslint*
-.gitignore
-.travis.yml
-tsconfig.json
-vsc-extension-quickstart.md
+.*ignore
+*.yml
