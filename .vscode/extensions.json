@@ -1,5 +1,7 @@
 {
-	"recommendations": [
-		"eg2.tslint"
-	]
+  "recommendations": [
+    "editorconfig.editorconfig",
+    "eg2.tslint",
+    "esbenp.prettier-vscode"
+  ]
 }
