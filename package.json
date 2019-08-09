@@ -67,6 +67,9 @@
     "@types/lodash": "^4.14.121",
     "@types/mocha": "^5.2.6",
     "@types/node": "^10.12.26",
+    "husky": "^3.0.3",
+    "lint-staged": "^9.2.1",
+    "prettier": "^1.18.2",
     "rimraf": "^2.6.3",
     "tslint": "^5.12.1",
     "typescript": "^3.3.3",
@@ -81,5 +84,32 @@
     "pretest": "npm run lint && npm run compile",
     "test": "node ./node_modules/vscode/bin/test",
     "vscode:prepublish": "npm run compile"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "npm run lint"
+    }
+  },
+  "lint-staged": {
+    "*.ts": [
+      "tslint --fix",
+      "prettier --write",
+      "git add"
+    ],
+    "*.{json,md}": [
+      "prettier --write",
+      "git add"
+    ],
+    "*.js": [
+      "git reset"
+    ]
+  },
+  "prettier": {
+    "arrowParens": "avoid",
+    "proseWrap": "always",
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "all"
   }
 }

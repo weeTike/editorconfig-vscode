@@ -1,29 +1,25 @@
-import { KnownProps } from 'editorconfig';
-import {
-	EndOfLine,
-	TextEdit
-} from 'vscode';
+import { KnownProps } from 'editorconfig'
+import { EndOfLine, TextEdit } from 'vscode'
 
-import PreSaveTransformation from './PreSaveTransformation';
+import PreSaveTransformation from './PreSaveTransformation'
 
 class SetEndOfLine extends PreSaveTransformation {
-
 	private eolMap = {
 		LF: EndOfLine.LF,
-		CRLF: EndOfLine.CRLF
-	};
+		CRLF: EndOfLine.CRLF,
+	}
 
-	transform(
-		editorconfigProperties: KnownProps
-	) {
-		const eolKey = (editorconfigProperties.end_of_line || '').toUpperCase();
-		const eol = this.eolMap[eolKey];
+	transform(editorconfigProperties: KnownProps) {
+		const eolKey = (editorconfigProperties.end_of_line || '').toUpperCase()
+		const eol = this.eolMap[eolKey]
 
-		return (eol) ? {
-			edits: [ TextEdit.setEndOfLine(eol) ],
-			message: `setEndOfLine(${eolKey})`
-		} : { edits: [] };
+		return eol
+			? {
+					edits: [TextEdit.setEndOfLine(eol)],
+					message: `setEndOfLine(${eolKey})`,
+			  }
+			: { edits: [] }
 	}
 }
 
-export default SetEndOfLine;
+export default SetEndOfLine

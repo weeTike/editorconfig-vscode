@@ -1,15 +1,15 @@
-import { KnownProps } from 'editorconfig';
-import { TextDocument, TextEdit, TextDocumentSaveReason } from 'vscode';
+import { KnownProps } from 'editorconfig'
+import { TextDocument, TextEdit, TextDocumentSaveReason } from 'vscode'
 
 abstract class PreSaveTransformation {
 	abstract transform(
 		editorconfig: KnownProps,
 		doc?: TextDocument,
-		reason?: TextDocumentSaveReason
+		reason?: TextDocumentSaveReason,
 	): {
-		edits: TextEdit[] | Error;
-		message?: string;
-	};
+		edits: TextEdit[] | Error
+		message?: string
+	}
 }
 
-export default PreSaveTransformation;
+export default PreSaveTransformation
