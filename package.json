@@ -33,7 +33,7 @@
   "activationEvents": [
     "*"
   ],
-  "main": "./out/src/editorConfigMain",
+  "main": "./out/src/editorConfigMain.js",
   "types": "./out/src/editorConfigMain.d.ts",
   "contributes": {
     "commands": [
@@ -75,12 +75,15 @@
     "eslint-config-prettier": "^6.0.0",
     "eslint-config-xo": "^0.26.0",
     "eslint-plugin-prettier": "^3.1.0",
+    "glob": "^7.1.4",
     "husky": "^3.0.3",
     "lint-staged": "^9.2.1",
+    "mocha": "^4.1.0",
     "prettier": "^1.18.2",
     "rimraf": "^2.6.3",
     "typescript": "^3.5.3",
     "vscode": "^1.1.36",
+    "vscode-test": "^1.2.0",
     "vscode-test-utils": "0.0.9"
   },
   "scripts": {
@@ -89,9 +92,11 @@
     "prebuild": "npm run clean",
     "build": "tsc",
     "postbuild": "cp -r src/test/suite/fixtures out/src/test/suite",
-    "lint": "eslint src/**/*.ts test/**/*.ts",
+    "lint": "eslint src/**/*.ts",
     "pretest": "npm run lint && npm run build",
     "test": "node ./node_modules/vscode/bin/test",
+    "prewatch": "npm run build",
+    "watch": "tsc -watch",
     "vscode:prepublish": "npm run build"
   },
   "husky": {

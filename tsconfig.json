@@ -13,11 +13,5 @@
     "forceConsistentCasingInFileNames": true,
     "declaration": true
   },
-  "include": [
-    "node_modules/@types/node/index.d.ts",
-    "node_modules/@types/lodash/index.d.ts",
-    "src/**/*.ts",
-    "test/**/*.ts"
-  ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", ".vscode-test"]
 }
