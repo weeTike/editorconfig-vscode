@@ -315,12 +315,12 @@ function withSetting(
 		},
 	}
 
-	async function createDoc(contents?: string) {
-		const filename = await utils.createFile(
-			contents || '',
+	async function createDoc(contents = '') {
+		const uri = await utils.createFile(
+			contents,
 			getFixturePath([rule, value, 'test']),
 		)
-		const doc = await workspace.openTextDocument(filename)
+		const doc = await workspace.openTextDocument(uri)
 		await window.showTextDocument(doc)
 		await wait(50) // wait for EditorConfig to apply new settings
 		return doc
