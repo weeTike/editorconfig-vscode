@@ -70,6 +70,7 @@
     "@types/node": "^12.7.1",
     "@typescript-eslint/eslint-plugin": "^1.13.0",
     "@typescript-eslint/parser": "^1.13.0",
+    "cash-cp": "^0.2.0",
     "eslint": "^6.1.0",
     "eslint-config-prettier": "^6.0.0",
     "eslint-config-xo": "^0.26.0",
@@ -84,12 +85,14 @@
   },
   "scripts": {
     "postinstall": "node ./node_modules/vscode/bin/install",
-    "precompile": "rimraf ./out",
-    "compile": "tsc",
+    "clean": "rimraf out",
+    "prebuild": "npm run clean",
+    "build": "tsc",
+    "postbuild": "cp -r src/test/suite/fixtures out/src/test/suite",
     "lint": "eslint src/**/*.ts test/**/*.ts",
-    "pretest": "npm run lint && npm run compile",
+    "pretest": "npm run lint && npm run build",
     "test": "node ./node_modules/vscode/bin/test",
-    "vscode:prepublish": "npm run compile"
+    "vscode:prepublish": "npm run build"
   },
   "husky": {
     "hooks": {
