@@ -9,7 +9,18 @@ export async function getOptionsForFixture(file: string[]) {
 }
 
 export function getFixturePath(file: string[]) {
-	return path.join(...[__dirname, '..', '..', 'test', 'fixtures'].concat(file))
+	return path.join(
+		...[
+			__dirname,
+			'..',
+			'..',
+			'out',
+			'src',
+			'test',
+			'suite',
+			'fixtures',
+		].concat(file),
+	)
 }
 
 export function wait(ms: number) {
