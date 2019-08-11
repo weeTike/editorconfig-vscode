@@ -3,7 +3,7 @@
   "displayName": "EditorConfig for VS Code",
   "description": "EditorConfig Support for Visual Studio Code",
   "publisher": "EditorConfig",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "icon": "EditorConfig_icon.png",
   "engines": {
     "vscode": "^1.37.0"
@@ -33,8 +33,8 @@
   "activationEvents": [
     "*"
   ],
-  "main": "./out/src/editorConfigMain.js",
-  "types": "./out/src/editorConfigMain.d.ts",
+  "main": "./out/editorConfigMain.js",
+  "types": "./out/editorConfigMain.d.ts",
   "contributes": {
     "commands": [
       {
@@ -60,14 +60,15 @@
   },
   "dependencies": {
     "editorconfig": "^0.15.3",
-    "lodash.compact": "^3.0.1",
     "lodash.get": "^4.4.2"
   },
   "devDependencies": {
-    "@types/lodash.compact": "^3.0.6",
+    "@types/glob": "^7.1.1",
+    "@types/lodash": "^4.14.136",
     "@types/lodash.get": "^4.4.6",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.7.1",
+    "@types/vscode": "^1.37.0",
     "@typescript-eslint/eslint-plugin": "^1.13.0",
     "@typescript-eslint/parser": "^1.13.0",
     "cash-cp": "^0.2.0",
@@ -78,31 +79,30 @@
     "glob": "^7.1.4",
     "husky": "^3.0.3",
     "lint-staged": "^9.2.1",
-    "mocha": "^4.1.0",
+    "mocha": "^6.2.0",
     "prettier": "^1.18.2",
     "rimraf": "^2.6.3",
     "typescript": "^3.5.3",
-    "vscode": "^1.1.36",
     "vscode-test": "^1.2.0",
     "vscode-test-utils": "0.0.9"
   },
   "scripts": {
-    "postinstall": "node ./node_modules/vscode/bin/install",
     "clean": "rimraf out",
     "prebuild": "npm run clean",
     "build": "tsc",
-    "postbuild": "cp -r src/test/suite/fixtures out/src/test/suite",
+    "postbuild": "cp -r src/test/suite/fixtures out/test/suite",
     "lint": "eslint src/**/*.ts",
     "pretest": "npm run lint && npm run build",
-    "test": "node ./node_modules/vscode/bin/test",
     "prewatch": "npm run build",
     "watch": "tsc -watch",
+    "check-types": "tsc --noEmit",
+    "test": "node out/test/runTest.js",
     "vscode:prepublish": "npm run build"
   },
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged",
-      "pre-push": "npm run lint"
+      "pre-push": "npm run lint && npm run check-types"
     }
   },
   "lint-staged": {

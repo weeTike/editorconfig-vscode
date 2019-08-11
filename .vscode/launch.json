@@ -13,13 +13,14 @@
       "preLaunchTask": "npm: watch"
     },
     {
-      "name": "Launch Tests",
+      "name": "Extension Tests",
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": [
+        "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceRoot}",
-        "--extensionTestsPath=${workspaceRoot}/out/test"
+        "--extensionTestsPath=${workspaceRoot}/out/test/suite/index"
       ],
       "stopOnEntry": false,
       "sourceMaps": true,
