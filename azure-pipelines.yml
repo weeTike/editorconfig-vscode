@@ -26,6 +26,7 @@ steps:
     condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
 
   - bash: |
+      npm install
       npm test
     displayName: Run Tests
     env:
