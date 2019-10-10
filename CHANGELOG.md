@@ -1,3 +1,7 @@
+## 0.14.1
+
+- **Fix:** Don't cache editor configuration, as it can change at any time.
+
 ## 0.13.0
 
 - **New:** Provide APIs to
