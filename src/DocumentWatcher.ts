@@ -19,7 +19,6 @@ import {
 
 import {
 	applyTextEditorOptions,
-	pickWorkspaceDefaults,
 	resolveCoreConfig,
 	resolveFile,
 	resolveTextEditorOptions,
@@ -27,7 +26,6 @@ import {
 
 export default class DocumentWatcher {
 	private disposable: Disposable
-	private defaults?: TextEditorOptions
 	private preSaveTransformations: PreSaveTransformation[] = [
 		new SetEndOfLine(),
 		new TrimTrailingWhitespace(),
@@ -48,7 +46,6 @@ export default class DocumentWatcher {
 					const newOptions = await resolveTextEditorOptions(
 						(this.doc = editor.document),
 						{
-							defaults: this.defaults,
 							onEmptyConfig: this.onEmptyConfig,
 						},
 					)
@@ -64,7 +61,6 @@ export default class DocumentWatcher {
 			window.onDidChangeWindowState(async state => {
 				if (state.focused && this.doc) {
 					const newOptions = await resolveTextEditorOptions(this.doc, {
-						defaults: this.defaults,
 						onEmptyConfig: this.onEmptyConfig,
 					})
 					applyTextEditorOptions(newOptions, {
@@ -75,13 +71,10 @@ export default class DocumentWatcher {
 			}),
 		)
 
-		subscriptions.push(workspace.onDidChangeConfiguration(this.onConfigChanged))
-
 		subscriptions.push(
 			workspace.onDidSaveTextDocument(doc => {
 				if (path.basename(doc.fileName) === '.editorconfig') {
 					this.log('.editorconfig file saved.')
-					this.onConfigChanged()
 				}
 			}),
 		)
@@ -109,7 +102,6 @@ export default class DocumentWatcher {
 		)
 
 		this.disposable = Disposable.from.apply(this, subscriptions)
-		this.onConfigChanged()
 	}
 
 	public onEmptyConfig = (relativePath: string) => {
@@ -139,13 +131,6 @@ export default class DocumentWatcher {
 
 	public dispose() {
 		this.disposable.dispose()
-	}
-
-	public onConfigChanged = () => {
-		this.log(
-			'Detected change in configuration:',
-			JSON.stringify((this.defaults = pickWorkspaceDefaults())),
-		)
 	}
 
 	private async calculatePreSaveTransformations(

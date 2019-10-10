@@ -3,10 +3,10 @@
   "displayName": "EditorConfig for VS Code",
   "description": "EditorConfig Support for Visual Studio Code",
   "publisher": "EditorConfig",
-  "version": "0.14.0",
+  "version": "0.14.1",
   "icon": "EditorConfig_icon.png",
   "engines": {
-    "vscode": "^1.37.0"
+    "vscode": "^1.39.0"
   },
   "author": "EditorConfig Team",
   "license": "MIT",
