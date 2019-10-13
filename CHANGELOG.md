@@ -1,3 +1,8 @@
+## 0.14.2
+
+- **Fix:** "File not found" issue when generating `.editorconfig` file
+  ([`#252`](https://github.com/editorconfig/editorconfig-vscode/issues/252)).
+
 ## 0.14.1
 
 - **Fix:** Don't cache editor configuration, as it can change at any time.

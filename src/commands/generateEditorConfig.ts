@@ -5,7 +5,7 @@ import { FileType, Uri, window, workspace } from 'vscode'
  * current vscode settings.
  */
 export async function generateEditorConfig(uri: Uri) {
-	const editorConfigUri = uri.with({ path: '.editorconfig' })
+	const editorConfigUri = Uri.parse(`${uri.toString()}/.editorconfig`)
 
 	try {
 		const stats = await workspace.fs.stat(editorConfigUri)
@@ -17,7 +17,7 @@ export async function generateEditorConfig(uri: Uri) {
 		}
 	} catch (err) {
 		if (err) {
-			if (err.code === 'ENOENT') {
+			if (err.name === 'EntryNotFound (FileSystemError)') {
 				writeFile()
 			} else {
 				window.showErrorMessage(err.message)
