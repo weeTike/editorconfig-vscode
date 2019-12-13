@@ -62,4 +62,4 @@ jobs:
           CI: true
         run: npm ci
       - name: Publish
-        uses: lannonbr/vsce-action@1.0.1
+        run: npx vsce publish -p ${{ secrets.VSCE_TOKEN }}
