@@ -5,7 +5,15 @@ import { FileType, Uri, window, workspace } from 'vscode'
  * current vscode settings.
  */
 export async function generateEditorConfig(uri: Uri) {
-	const editorConfigUri = Uri.parse(`${uri.toString()}/.editorconfig`)
+	const workspaceUri =
+		workspace.workspaceFolders && workspace.workspaceFolders[0].uri
+	const currentUri = uri || workspaceUri
+	if (!currentUri) {
+		window.showErrorMessage("Workspace doesn't contain any folders.")
+		return
+	}
+
+	const editorConfigUri = Uri.parse(`${currentUri.toString()}/.editorconfig`)
 
 	try {
 		const stats = await workspace.fs.stat(editorConfigUri)
@@ -27,8 +35,8 @@ export async function generateEditorConfig(uri: Uri) {
 	}
 
 	async function writeFile() {
-		const editor = workspace.getConfiguration('editor', uri)
-		const files = workspace.getConfiguration('files', uri)
+		const editor = workspace.getConfiguration('editor', currentUri)
+		const files = workspace.getConfiguration('files', currentUri)
 
 		const settingsLines = ['root = true', '', '[*]']
 		function addSetting(key: string, value?: string | number | boolean): void {
