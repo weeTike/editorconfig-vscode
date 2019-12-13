@@ -1,7 +1,10 @@
 # [EditorConfig][] for [Visual Studio Code][]
 
-[![GitHub Actions](https://github.com/editorconfig/editorconfig-vscode/workflows/Node%20CI/badge.svg?event=push)](https://github.com/editorconfig/editorconfig-vscode/actions)
+[![GitHub Actions][ga-img][actions]] [![Gitter][chat-img]][chat]
 
+[actions]: https://github.com/editorconfig/editorconfig-vscode/actions
+[ga-img]:
+  https://github.com/editorconfig/editorconfig-vscode/workflows/Node%20CI/badge.svg?event=push
 [chat-img]:
   https://img.shields.io/badge/Gitter-Join_the_EditorConfig_VSCode_chat-brightgreen.svg
 [chat]: https://gitter.im/editorconfig/editorconfig-vscode
