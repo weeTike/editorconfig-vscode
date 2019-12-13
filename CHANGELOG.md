@@ -1,3 +1,8 @@
+## 0.14.3
+
+- **Fix:** unhandled error when generating `.editorconfig`
+  ([`#255`](https://github.com/editorconfig/editorconfig-vscode/pull/255)).
+
 ## 0.14.2
 
 - **Fix:** "File not found" issue when generating `.editorconfig` file
