@@ -1,6 +1,6 @@
 # [EditorConfig][] for [Visual Studio Code][]
 
-[![GitHub Actions][ga-img][actions]] [![Gitter][chat-img]][chat]
+[![GitHub Actions][ga-img]][actions] [![Gitter][chat-img]][chat]
 
 [actions]: https://github.com/editorconfig/editorconfig-vscode/actions
 [ga-img]:
