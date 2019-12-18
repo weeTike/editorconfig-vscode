@@ -93,8 +93,8 @@ export default class DocumentWatcher {
 				)
 				e.waitUntil(transformations)
 				if (selections.length) {
-					await transformations
-					if (activeEditor) {
+					const edits = await transformations
+					if (activeEditor && edits.length > 0) {
 						activeEditor.selections = selections
 					}
 				}
