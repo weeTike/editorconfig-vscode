@@ -3,10 +3,10 @@ name: Node CI
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   test:
@@ -42,7 +42,7 @@ jobs:
           npm test
         env:
           CI: true
-          DISPLAY: ':99.0'
+          DISPLAY: ":99.0"
 
   release:
     name: vsce publish
