@@ -2,7 +2,8 @@
 
 [![GitHub Actions][actions-img]][actions] [![Gitter][chat-img]][chat]
 
-[![Testing](https://github.com/editorconfig/editorconfig-vscode/actions/workflows/test.yml/badge.svg)](https://github.com/editorconfig/editorconfig-vscode/actions/workflows/test.yml)
+[actions-img]: https://github.com/editorconfig/editorconfig-vscode/actions/workflows/test.yml/badge.svg
+[actions]: https://github.com/editorconfig/editorconfig-vscode/actions
 [chat-img]:
   https://img.shields.io/badge/Gitter-Join_the_EditorConfig_VSCode_chat-brightgreen.png?style=flat-square
 [chat]: https://gitter.im/editorconfig/editorconfig-vscode
