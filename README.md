@@ -2,9 +2,7 @@
 
 [![GitHub Actions][actions-img]][actions] [![Gitter][chat-img]][chat]
 
-[actions-img]:
-  https://img.shields.io/endpoint.png?url=https%3A%2F%2Factions-badge.atrox.dev%2Feditorconfig%2Feditorconfig-vscode%2Fbadge&style=flat-square
-[actions]: https://github.com/editorconfig/editorconfig-vscode/actions
+[![Testing](https://github.com/editorconfig/editorconfig-vscode/actions/workflows/test.yml/badge.svg)](https://github.com/editorconfig/editorconfig-vscode/actions/workflows/test.yml)
 [chat-img]:
   https://img.shields.io/badge/Gitter-Join_the_EditorConfig_VSCode_chat-brightgreen.png?style=flat-square
 [chat]: https://gitter.im/editorconfig/editorconfig-vscode
