@@ -230,7 +230,7 @@
 ## 0.3.4
 
 - [Use
-  `onWillSaveTextDocument`]https://github.com/editorconfig/editorconfig-vscode/pull/80,
+  `onWillSaveTextDocument`]<https://github.com/editorconfig/editorconfig-vscode/pull/80>,
   fixes [`#76`](https://github.com/editorconfig/editorconfig-vscode/issues/76)
   and [`#79`](https://github.com/editorconfig/editorconfig-vscode/issues/79)
   (thanks [`@SamVerschueren`](https://github.com/SamVerschueren))!
@@ -260,7 +260,7 @@
 
 - [Fix applying transformations to .editorconfig itself](https://github.com/editorconfig/editorconfig-vscode/issues/9)
   (thanks [`@SamVerschueren`](https://github.com/SamVerschueren))!
-- [Fix marketplace icon](https://github.com/editorconfig/editorconfig-vscode/commits/master)
+- [Fix marketplace icon](https://github.com/editorconfig/editorconfig-vscode/commits/main)
   (thanks [`@SamVerschueren`](https://github.com/SamVerschueren))!
 
 ## 0.2.2
