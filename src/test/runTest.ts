@@ -1,6 +1,6 @@
 import * as path from 'path'
 
-import { runTests } from 'vscode-test'
+import { runTests } from '@vscode/test-electron'
 
 async function main() {
 	try {
@@ -29,6 +29,7 @@ async function main() {
 			extensionTestsPath: untitledExtensionTestsPath,
 			launchArgs: [untitledWorkspace],
 		})
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	} catch (err) {
 		// tslint:disable-next-line:no-console
 		console.error('Failed to run tests')
