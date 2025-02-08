@@ -8,7 +8,6 @@ import {
 	TextEditorOptions,
 	window,
 	workspace,
-	WorkspaceEdit,
 } from 'vscode'
 import {
 	InsertFinalNewline,
@@ -40,6 +39,8 @@ export default class DocumentWatcher {
 
 		const subscriptions: Disposable[] = []
 
+		let previousSelections: Selection[] = []
+
 		this.handleTextEditorChange(window.activeTextEditor)
 
 		subscriptions.push(
@@ -64,6 +65,11 @@ export default class DocumentWatcher {
 
 		subscriptions.push(
 			workspace.onDidSaveTextDocument(doc => {
+				const activeEditor = window.activeTextEditor
+				if (activeEditor && previousSelections.length) {
+					activeEditor.selections = previousSelections
+				}
+
 				if (path.basename(doc.fileName) === '.editorconfig') {
 					this.log('.editorconfig file saved.')
 				}
@@ -72,25 +78,16 @@ export default class DocumentWatcher {
 
 		subscriptions.push(
 			workspace.onWillSaveTextDocument(async e => {
-				let selections: readonly Selection[] = []
 				const activeEditor = window.activeTextEditor
 				const activeDoc = activeEditor?.document
 				if (activeDoc && activeDoc === e.document && activeEditor) {
-					selections = [...activeEditor.selections]
+					previousSelections = [...activeEditor.selections]
 				}
 				const transformations = this.calculatePreSaveTransformations(
 					e.document,
 					e.reason,
 				)
-
-				const workspaceEdit = new WorkspaceEdit()
-				const textEdits = await transformations
-				workspaceEdit.set(e.document.uri, textEdits)
-				await workspace.applyEdit(workspaceEdit)
-
-				if (activeEditor && textEdits.length && selections.length) {
-					activeEditor.selections = selections
-				}
+				e.waitUntil(transformations)
 			}),
 		)
 
