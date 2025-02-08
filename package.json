@@ -103,6 +103,9 @@
     "virtualWorkspaces": {
       "supported": false,
       "description": "The `editorconfig` dependency requires fs access for parsing the config to use."
+    },
+    "untrustedWorkspaces": {
+      "supported": true
     }
   },
   "dependencies": {
