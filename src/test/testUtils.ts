@@ -5,7 +5,7 @@ import * as utils from 'vscode-test-utils'
 
 export async function getOptionsForFixture(file: string[]) {
 	await utils.openFile(Uri.file(getFixturePath(file)))
-	return await getTextEditorOptions()
+	return getTextEditorOptions()
 }
 
 export function getFixturePath(file: string[]) {
@@ -23,17 +23,20 @@ export function wait(ms: number) {
 async function getTextEditorOptions() {
 	let resolved = false
 
-	return new Promise<TextEditorOptions>(async resolve => {
+	return new Promise<TextEditorOptions>(resolve => {
 		window.onDidChangeTextEditorOptions(e => {
 			resolved = true
 			assert.ok(e.options)
 			resolve(e.options)
-		})
-		await wait(100)
-		if (resolved) {
-			return
-		}
-		assert.ok(window.activeTextEditor!.options)
-		resolve(window.activeTextEditor!.options)
+		});
+
+		(async () => {
+			await wait(100)
+			if (resolved) {
+				return
+			}
+			assert.ok(window.activeTextEditor!.options)
+			resolve(window.activeTextEditor!.options)
+		})();
 	})
 }
